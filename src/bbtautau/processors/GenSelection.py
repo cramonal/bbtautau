@@ -42,6 +42,61 @@ def _sum_taus(taut):
     return ak.sum(taut, axis=1)
 
 
+def gen_selection_Ztautau(
+    events: NanoEventsArray,
+    fatjets: FatJetArray,  # noqa: ARG001
+    selection_args: list,
+):
+    """Gets Z and tautau 4-vectors + tau decay information"""
+
+    genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
+
+
+    Z = genparts[genparts.pdgId == PDGID.Z]
+
+    # saving 4-vector info
+    GenZVars = {f"GenZ{key}": Z[var].to_numpy() for (var, key) in P4.items()}
+
+   
+    Z_children = Z.children
+    # pad_val is necessary to avoid a numpy MaskedArray even though all events have exactly 2 Higgs'
+    GenZVars["GenZChildren"] = pad_val(Z_children.pdgId[:, :, 0], 2, axis=1)
+
+    # finding bb and VV children
+
+    is_tt = np.abs(Z_children.pdgId) == PDGID.tau
+
+    # checking that there are 2 bs and 2 taus
+
+    has_tt = ak.sum(ak.flatten(is_tt, axis=2), axis=1) == 2
+    if selection_args is not None:
+        add_selection("has_tautau",  has_tt, *selection_args)
+
+    taus = higgs_children[is_tt]
+    flat_taus = ak.flatten(taus, axis=2)
+    GenTauVars = {f"GenTau{key}": pad_val(flat_taus[var], 2, axis=1) for (var, key) in P4.items()}
+
+    tau_children = ak.flatten(taus.children, axis=2)
+    tau_children = _iterate_children(tau_children, PDGID.tau)
+
+    # check if tau children are leptons or hadrons
+    # check neutral and charged pion IDs for hadronic taus
+    tauh = _sum_taus(
+        ak.any([ak.any(np.abs(tau_children.pdgId) == pid, axis=2) for pid in PDGID.pions], axis=0)
+    )
+    taumu = _sum_taus(ak.any(np.abs(tau_children.pdgId) == PDGID.mu, axis=2))
+    taue = _sum_taus(ak.any(np.abs(tau_children.pdgId) == PDGID.e, axis=2))
+
+    GenTauVars["GenTauhh"] = (tauh == 2).to_numpy()
+    GenTauVars["GenTauhm"] = ((tauh == 1) & (taumu == 1)).to_numpy()
+    GenTauVars["GenTauhe"] = ((tauh == 1) & (taue == 1)).to_numpy()
+
+
+
+    return {**GenZVars,  **GenTauVars}  # , **GenMatchingVars}
+
+
+
 def gen_selection_HHbbtautau(
     events: NanoEventsArray,
     fatjets: FatJetArray,  # noqa: ARG001
