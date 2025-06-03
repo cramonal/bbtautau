@@ -165,7 +165,7 @@ def good_ak4jets(jets: JetArray, nano_version: str):
         jetidtight, jetidtightlepveto = jetid_v15(jets)  # v12 jetid fix
     else:
         raise NotImplementedError(f"Jet ID fix not implemented yet for {nano_version}")
-    jet_sel = (jets.pt > 15) & (np.abs(jets.eta) < 4.7) & jetidtight & jetidtightlepveto
+    jet_sel = (jets.pt >= 25) & (np.abs(jets.eta) < 2.4) & jetidtight & jetidtightlepveto #jetidMedium
 
     return jets[jet_sel]
 
@@ -216,6 +216,33 @@ def good_electrons(events, leptons: ElectronArray, year: str):
 
     return leptons, TrigMatchDict
 
+def loose_electrons(events, leptons: ElectronArray, year: str):
+    # from https://indico.cern.ch/event/1495537/contributions/6355656/attachments/3012754/5312393/2025.02.11_Run3HHbbtautau_CMSweek.pdf
+    trigobj = events.TrigObj
+
+    # baseline kinematic selection
+    lsel = (
+        leptons.mvaNoIso_WP90
+        & (leptons.pt >= 10)
+        & (abs(leptons.eta) < 2.5)
+        & (abs(leptons.dz) < 0.2)
+        & (abs(leptons.dxy) < 0.05)
+        & (abs(leptons.miniPFRelIso_all) == 0.2)
+    )
+    leptons = leptons[lsel]
+
+    # Trigger: (filterbit, ptcut for matched lepton)
+    triggers = {"EGamma": (1, 31), "ETau": (6, 25)}
+    trig_leptons = trigobj[trigobj.id == PDGID.e]
+
+    TrigMatchDict = {
+        f"ElectronTrigMatch{trigger}": trig_match_sel(
+            events, leptons, trig_leptons, year, trigger, filterbit, ptcut
+        )
+        for trigger, (filterbit, ptcut) in triggers.items()
+    }
+
+    return leptons, TrigMatchDict
 
 """
 Trigger quality bits in NanoAOD v12
@@ -261,6 +288,32 @@ def good_muons(events, leptons: MuonArray, year: str):
 
     return leptons, TrigMatchDict
 
+def loose_muons(events, leptons: MuonArray, year: str):
+    # from https://indico.cern.ch/event/1495537/contributions/6355656/attachments/3012754/5312393/2025.02.11_Run3HHbbtautau_CMSweek.pdf
+    trigobj = events.TrigObj
+
+    lsel = (
+        leptons.looseId
+        & (leptons.pt >= 10)
+        & (abs(leptons.eta) < 2.4)
+        & (abs(leptons.dz) < 0.2)
+        & (abs(leptons.dxy) < 0.05)
+        & (abs(leptons.miniPFRelIso_all) == 0.2)
+    )
+    leptons = leptons[lsel]
+
+    # Trigger: (filterbit, ptcut for matched lepton)
+    triggers = {"Muon": (3, 26), "MuonTau": (6, 22)}
+    trig_leptons = trigobj[trigobj.id == PDGID.mu]
+
+    TrigMatchDict = {
+        f"MuonTrigMatch{trigger}": trig_match_sel(
+            events, leptons, trig_leptons, year, trigger, filterbit, ptcut
+        )
+        for trigger, (filterbit, ptcut) in triggers.items()
+    }
+
+    return leptons, TrigMatchDict
 
 """
 Trigger quality bits in NanoAOD v12
@@ -391,6 +444,9 @@ def ak4_jets_awayfromak8(
     if sort_by == "btag":
         jets_pnetb = jets[ak.argsort(jets.btagPNetB, ascending=False)]
         return jets_pnetb[ak4_sel][:, :2]
+    elif sort_by == "btag_all":
+        jets_pnetb = jets[ak.argsort(jets.btagPNetB, ascending=False)]
+        return jets_pnetb[ak4_sel]
     # return 2 jets closet to bbFatjet and ttFatjet, respectively
     elif sort_by == "nearest":
         jets_away = jets[ak4_sel]
