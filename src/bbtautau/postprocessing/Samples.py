@@ -9,8 +9,8 @@ CHANNELS = {
     "hh": Channel(
         key="hh",
         label=r"$\tau_h\tau_h$",
-        hlt_types=["PNet", "PFJet", "QuadJet", "Parking", "DiTau", "DitauJet", "SingleTau", "MET"],
-        data_samples=["jetmet", "tau"],
+        hlt_types=["DiTau", "DitauJet", "SingleTau"],
+        data_samples=["tau"],
         isLepton=False,
         tagger_label="tauhtauh",
         txbb_cut=0.907,
@@ -45,26 +45,26 @@ CHANNELS = {
 
 # overall list of samples
 SAMPLES = {
-    "jetmet": Sample(
-        selector="^(JetHT|JetMET)",
-        label="JetMET",
-        isData=True,
-    ),
+    #"jetmet": Sample(
+    #    selector="^(JetHT|JetMET)",
+    #    label="JetMET",
+    #    isData=True,
+    #),
     "tau": Sample(
         selector="^Tau_Run",
         label="Tau",
         isData=True,
     ),
-    "muon": Sample(
-        selector="^Muon_Run",
-        label="Muon",
-        isData=True,
-    ),
-    "egamma": Sample(
-        selector="^EGamma_Run",
-        label="EGamma",
-        isData=True,
-    ),
+    #"muon": Sample(
+    #    selector="^Muon_Run",
+    #    label="Muon",
+    #    isData=True,
+    #),
+    #"egamma": Sample(
+    #    selector="^EGamma_Run",
+    #    label="EGamma",
+    #     isData=True,
+    # ),
     "qcd": Sample(
         selector="^QCD",
         label="QCD Multijet",
@@ -100,29 +100,30 @@ SAMPLES = {
         label="Z+Jets",
         isSignal=False,
     ),
-    "hbb": Sample(
-        selector="^(GluGluHto2B|VBFHto2B|WminusH_Hto2B|WplusH_Hto2B|ZH_Hto2B|ggZH_Hto2B)",
-        label="Hbb",
-        isSignal=False,
-    ),
-    "bbtt": Sample(
-        selector=hh_vars.bbtt_sigs["bbtt"],
-        label=r"ggF HHbb$\tau\tau$",
-        isSignal=True,
-    ),
-    "vbfbbtt": Sample(
-        selector=hh_vars.bbtt_sigs["vbfbbtt"],
-        label=r"VBF HHbb$\tau\tau$ (SM)",
-        isSignal=True,
-    ),
-    "vbfbbtt-k2v0": Sample(
-        selector=hh_vars.bbtt_sigs["vbfbbtt-k2v0"],
-        label=r"VBF HHbb$\tau\tau$ ($\kappa_{2V}=0$)",
-        isSignal=True,
-    ),
+    #"hbb": Sample(
+    #    selector="^(GluGluHto2B|VBFHto2B|WminusH_Hto2B|WplusH_Hto2B|ZH_Hto2B|ggZH_Hto2B)",
+    #    label="Hbb",
+    #    isSignal=False,
+    #),
+    #"bbtt": Sample(
+    #    selector=hh_vars.bbtt_sigs["bbtt"],
+    #    label=r"ggF HHbb$\tau\tau$",
+    #    isSignal=True,
+    #),
+    #"vbfbbtt": Sample(
+    #    selector=hh_vars.bbtt_sigs["vbfbbtt"],
+    #    label=r"VBF HHbb$\tau\tau$ (SM)",
+    #    isSignal=True,
+    #),
+    #"vbfbbtt-k2v0": Sample(
+    #    selector=hh_vars.bbtt_sigs["vbfbbtt-k2v0"],
+    #    label=r"VBF HHbb$\tau\tau$ ($\kappa_{2V}=0$)",
+    #    isSignal=True,
+    #),
 }
 
 SIGNALS = ["bbtt", "vbfbbtt", "vbfbbtt-k2v0"]
+SIGNALS = []
 SIGNALS_CHANNELS = SIGNALS.copy()
 
 sig_keys_ggf = ["bbtt"]
@@ -138,7 +139,7 @@ for signal in SIGNALS.copy():
         SIGNALS_CHANNELS.append(f"{signal}{channel}")
 
 DATASETS = ["jetmet", "tau", "egamma", "muon"]
-
+DATASETS = ["tau"]
 BGS = [
     "qcd",
     "ttbarhad",
@@ -147,10 +148,10 @@ BGS = [
     "dyjets",
     "wjets",
     "zjets",
-    "hbb",
+    #"hbb",
 ]
 
-single_h_keys = ["hbb"]
+single_h_keys = []
 ttbar_keys = ["ttbarhad", "ttbarsl", "ttbarll"]
 
 qcdouts = ["QCD0HF", "QCD1HF", "QCD2HF"]

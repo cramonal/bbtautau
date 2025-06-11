@@ -38,9 +38,9 @@ logger = logging.getLogger("boostedhh.utils")
 
 base_filters_default = [
     [
-        ("('ak8FatJetPt', '0')", ">=", 250),
-        ("('ak8FatJetPNetmassLegacy', '0')", ">=", 50),
-        ("('ak8FatJetPt', '1')", ">=", 200),
+        ("('ak8FatJetPt', '0')", ">=", 200),
+        #("('ak8FatJetPNetmassLegacy', '0')", ">=", 50),
+        #("('ak8FatJetPt', '1')", ">=", 200),
         # ("('ak8FatJetMsd', '0')", ">=", msd_cut),
         # ("('ak8FatJetMsd', '1')", ">=", msd_cut),
         # ("('ak8FatJetPNetXbb', '0')", ">=", 0.8),
@@ -75,30 +75,30 @@ control_plot_vars = (
         ShapeVar(var=f"ak8FatJetPhi{i}", label=rf"$\phi^{{j{i + 1}}}$", bins=[20, -3.2, 3.2])
         for i in range(3)
     ]
-    + [
-        ShapeVar(
-            var=f"ak8FatJetPNetmassLegacy{i}",
-            label=rf"PNet Legacy $m_{{reg}}^{{j{i + 1}}}$",
-            bins=[20, 50, 300],
-        )
-        for i in range(3)
-    ]
-    + [
-        ShapeVar(
-            var=f"ak8FatJetParTmassResApplied{i}",
-            label=rf"ParT Resonance $m_{{reg}}^{{j{i + 1}}}$",
-            bins=[20, 50, 300],
-        )
-        for i in range(3)
-    ]
-    + [
-        ShapeVar(
-            var=f"ak8FatJetParTmassVisApplied{i}",
-            label=rf"ParT Visable $m_{{reg}}^{{j{i + 1}}}$",
-            bins=[20, 50, 300],
-        )
-        for i in range(3)
-    ]
+    #+ [
+    #    ShapeVar(
+    #        var=f"ak8FatJetPNetmassLegacy{i}",
+    #        label=rf"PNet Legacy $m_{{reg}}^{{j{i + 1}}}$",
+    #        bins=[20, 50, 300],
+    #    )
+    #    for i in range(3)
+    #]
+    #+ [
+    #    ShapeVar(
+    #        var=f"ak8FatJetParTmassResApplied{i}",
+    #        label=rf"ParT Resonance $m_{{reg}}^{{j{i + 1}}}$",
+    #        bins=[20, 50, 300],
+    #    )
+    #    for i in range(3)
+    #]
+    #+ [
+    #    ShapeVar(
+    #        var=f"ak8FatJetParTmassVisApplied{i}",
+    #        label=rf"ParT Visable $m_{{reg}}^{{j{i + 1}}}$",
+    #        bins=[20, 50, 300],
+    #    )
+    #    for i in range(3)
+    #]
     # ak8FatJetParTXbbvsQCD
     + [
         ShapeVar(
@@ -137,15 +137,15 @@ control_plot_vars = (
 )
 
 # fitting on bb regressed mass
-shape_vars = [
-    ShapeVar(
-        "bbFatJetPNetmassLegacy",
-        r"$m^{bb}_\mathrm{Reg}$ [GeV]",
-        [16, 60, 220],
-        reg=True,
-        blind_window=[110, 140],
-    )
-]
+#shape_vars = [
+#    ShapeVar(
+#        "bbFatJetPNetmassLegacy",
+#        r"$m^{bb}_\mathrm{Reg}$ [GeV]",
+#        [16, 60, 220],
+#        reg=True,
+#        blind_window=[110, 140],
+#    )
+#]
 
 
 def main(args: argparse.Namespace):
@@ -324,9 +324,9 @@ def get_columns(
         columns_data += [
             ("ak8FatJetPNetXbbLegacy", num_fatjets),
             ("ak8FatJetPNetQCDLegacy", num_fatjets),
-            ("ak8FatJetPNetmassLegacy", num_fatjets),
-            ("ak8FatJetParTmassResApplied", num_fatjets),
-            ("ak8FatJetParTmassVisApplied", num_fatjets),
+            #("ak8FatJetPNetmassLegacy", num_fatjets),
+            #("ak8FatJetParTmassResApplied", num_fatjets),
+            #("ak8FatJetParTmassVisApplied", num_fatjets),
             ("ak8FatJetMsd", num_fatjets),
         ]
 
@@ -382,13 +382,13 @@ def load_samples(
     events_dict = {}
 
     samples = Samples.SAMPLES.copy()
-    signals = Samples.SIGNALS.copy()
+    #signals = Samples.SIGNALS.copy()
 
     if load_just_bbtt:  # quite ad hoc but should become obsolete
         del samples["vbfbbtt-k2v0"]
         del samples["vbfbbtt"]
-        signals.remove("vbfbbtt-k2v0")
-        signals.remove("vbfbbtt")
+        #signals.remove("vbfbbtt-k2v0")
+        #signals.remove("vbfbbtt")
 
     # remove unnecessary data samples
     for key in Samples.DATASETS + (not load_bgs) * Samples.BGS:
@@ -422,9 +422,10 @@ def load_samples(
                 events_dict[key] = LoadedSample(sample=sample, events=events)
 
     # keep only the specified bbtt channel
+    '''
     for signal in signals:
         if not loaded_samples:
-            # quick fix due to old naming still in samples
+         # quick fix due to old naming still in samples
             events_dict[f"{signal}{channel.key}"] = events_dict[signal][
                 events_dict[signal][f"GenTau{channel.key}"][0]
             ]
@@ -437,7 +438,7 @@ def load_samples(
                 ],
             )
             del events_dict[signal]
-
+    '''
     return events_dict
 
 
@@ -446,7 +447,7 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
     ldataset = channel.lepton_dataset
 
     # storing triggers fired per dataset
-    trigdict = {"jetmet": {}, "tau": {}}
+    trigdict = { "tau": {}}
     if channel.isLepton:
         trigdict[ldataset] = {}
         lepton_triggers = utils.list_intersection(
@@ -454,9 +455,9 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
         )
 
     # JetMET triggers considered in this channel
-    jet_triggers = utils.list_intersection(
-        HLTs.hlts_by_dataset(year, "JetMET", data_only=True), channel.triggers(year, data_only=True)
-    )
+    #jet_triggers = utils.list_intersection(
+    #    HLTs.hlts_by_dataset(year, "JetMET", data_only=True), channel.triggers(year, data_only=True)
+    #)
 
     # Tau triggers considered in this channel
     tau_triggers = utils.list_intersection(
@@ -464,12 +465,12 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
     )
 
     for key, d in trigdict.items():
-        d["jets"] = np.sum([events_dict[key][hlt][0] for hlt in jet_triggers], axis=0).astype(bool)
+
         if key == "jetmet":
             continue
 
         d["taus"] = np.sum([events_dict[key][hlt][0] for hlt in tau_triggers], axis=0).astype(bool)
-        d["taunojets"] = ~d["jets"] & d["taus"]
+        d["taunojets"] = d["taus"]
 
         if key == "tau":
             continue
@@ -486,7 +487,7 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
     # remove overlap
     # print(trigdict["jetmet"])
 
-    events_dict["jetmet"] = events_dict["jetmet"][trigdict["jetmet"]["jets"]]
+    #events_dict["jetmet"] = events_dict["jetmet"][trigdict["jetmet"]["jets"]]
     events_dict["tau"] = events_dict["tau"][trigdict["tau"]["taunojets"]]
 
     return events_dict
@@ -519,7 +520,7 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
     ldataset = channel.lepton_dataset
 
     # storing triggers fired per dataset
-    trigdict = {"jetmet": {}, "tau": {}}
+    trigdict = { "tau": {}}
     if channel.isLepton:
         trigdict[ldataset] = {}
         lepton_triggers = utils.list_intersection(
@@ -527,9 +528,9 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
         )
 
     # JetMET triggers considered in this channel
-    jet_triggers = utils.list_intersection(
-        HLTs.hlts_by_dataset(year, "JetMET", data_only=True), channel.triggers(year, data_only=True)
-    )
+    #jet_triggers = utils.list_intersection(
+    #    HLTs.hlts_by_dataset(year, "JetMET", data_only=True), channel.triggers(year, data_only=True)
+    #)
 
     # Tau triggers considered in this channel
     tau_triggers = utils.list_intersection(
@@ -537,16 +538,14 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
     )
 
     for key, d in trigdict.items():
-        d["jets"] = np.sum([events_dict[key].get_var(hlt) for hlt in jet_triggers], axis=0).astype(
-            bool
-        )
+
         if key == "jetmet":
             continue
 
         d["taus"] = np.sum([events_dict[key].get_var(hlt) for hlt in tau_triggers], axis=0).astype(
             bool
         )
-        d["taunojets"] = ~d["jets"] & d["taus"]
+        d["taunojets"] =  d["taus"]
 
         if key == "tau":
             continue
@@ -563,7 +562,7 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
     # remove overlap
     # print(trigdict["jetmet"])
 
-    events_dict["jetmet"].apply_selection(trigdict["jetmet"]["jets"])
+    #events_dict["jetmet"].apply_selection(trigdict["jetmet"]["jets"])
     events_dict["tau"].apply_selection(trigdict["tau"]["taunojets"])
 
     return events_dict
@@ -585,7 +584,9 @@ def apply_triggers(
 
     # MC
     for _skey, sample in events_dict.items():
+
         if not sample.sample.isData:
+            print(channel.triggers(year, mc_only=True))
             triggered = np.sum(
                 [sample.get_var(hlt) for hlt in channel.triggers(year, mc_only=True)], axis=0
             ).astype(bool)

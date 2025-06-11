@@ -24,6 +24,7 @@ from bbtautau.postprocessing import Samples
 
 def get_var(events: pd.DataFrame, bbtt_mask: pd.DataFrame, feat: str):
     if feat in events:
+        print("feat",feat)
         return events[feat].to_numpy().squeeze()
     elif feat.startswith(("bb", "tt")):
         jkey = feat[:2]
