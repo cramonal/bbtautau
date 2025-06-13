@@ -39,27 +39,30 @@ logger = logging.getLogger("boostedhh.utils")
 base_filters_default = [
     [
         ("('ak8FatJetPt', '0')", ">=", 200),
-        #("('ak8FatJetPNetmassLegacy', '0')", ">=", 50),
-        #("('ak8FatJetPt', '1')", ">=", 200),
+        # ("('ak8FatJetPNetmassLegacy', '0')", ">=", 50),
+        # ("('ak8FatJetPt', '1')", ">=", 200),
         # ("('ak8FatJetMsd', '0')", ">=", msd_cut),
-        # ("('ak8FatJetMsd', '1')", ">=", msd_cut),
         # ("('ak8FatJetPNetXbb', '0')", ">=", 0.8),
     ]
 ]
 
 
 control_plot_vars = (
+    # [
+    #    ShapeVar(var=f"{jet}FatJetPt", label=rf"$p_T^{{{jlabel}}}$ [GeV]", bins=[20, 250, 1250])
+    #    for jet, jlabel in [("bb", "bb"), ("tt", r"\tau\tau")]
+    # ]
+    # [
+    #   ShapeVar(
+    #       var="METPt", label=r"$p^{miss}_T$ [GeV]", bins=[20, 0, 300]
+    #   ),  # METPt is used for resel samples
+    #   ShapeVar(var="MET_phi", label=r"$\phi^{miss}$", bins=[20, -3.2, 3.2]),
+    # ]
+    # [
+    #    ShapeVar(var="MET_phi", label=r"$\phi^{miss}$", bins=[20, -3.2, 3.2])
+    # ]
+    # +
     [
-        ShapeVar(var=f"{jet}FatJetPt", label=rf"$p_T^{{{jlabel}}}$ [GeV]", bins=[20, 250, 1250])
-        for jet, jlabel in [("bb", "bb"), ("tt", r"\tau\tau")]
-    ]
-    + [
-        ShapeVar(
-            var="METPt", label=r"$p^{miss}_T$ [GeV]", bins=[20, 0, 300]
-        ),  # METPt is used for resel samples
-        # ShapeVar(var="MET_phi", label=r"$\phi^{miss}$", bins=[20, -3.2, 3.2]),
-    ]
-    + [
         ShapeVar(var=f"ak8FatJetPt{i}", label=rf"$p_T^{{j{i + 1}}}$ [GeV]", bins=[20, 250, 1250])
         for i in range(3)
     ]
@@ -67,77 +70,78 @@ control_plot_vars = (
         ShapeVar(var=f"ak8FatJetMsd{i}", label=rf"$m_{{SD}}^{{j{i + 1}}}$ [GeV]", bins=[20, 0, 300])
         for i in range(3)
     ]
-    + [
-        ShapeVar(var=f"ak8FatJetEta{i}", label=rf"$\eta^{{j{i + 1}}}$", bins=[20, -2.5, 2.5])
-        for i in range(3)
-    ]
-    + [
-        ShapeVar(var=f"ak8FatJetPhi{i}", label=rf"$\phi^{{j{i + 1}}}$", bins=[20, -3.2, 3.2])
-        for i in range(3)
-    ]
-    #+ [
+    # + [
+    #    ShapeVar(var=f"ak8FatJetEta{i}", label=rf"$\eta^{{j{i + 1}}}$", bins=[20, -2.5, 2.5])
+    #    for i in range(3)
+    # ]
+    # + [
+    #    ShapeVar(var=f"ak8FatJetPhi{i}", label=rf"$\phi^{{j{i + 1}}}$", bins=[20, -3.2, 3.2])
+    #    for i in range(3)
+    # ]
+    # + [
     #    ShapeVar(
     #        var=f"ak8FatJetPNetmassLegacy{i}",
     #        label=rf"PNet Legacy $m_{{reg}}^{{j{i + 1}}}$",
     #        bins=[20, 50, 300],
     #    )
     #    for i in range(3)
-    #]
-    #+ [
+    # ]
+    # + [
     #    ShapeVar(
     #        var=f"ak8FatJetParTmassResApplied{i}",
     #        label=rf"ParT Resonance $m_{{reg}}^{{j{i + 1}}}$",
     #        bins=[20, 50, 300],
     #    )
     #    for i in range(3)
-    #]
-    #+ [
+    # ]
+    # + [
     #    ShapeVar(
     #        var=f"ak8FatJetParTmassVisApplied{i}",
     #        label=rf"ParT Visable $m_{{reg}}^{{j{i + 1}}}$",
     #        bins=[20, 50, 300],
     #    )
     #    for i in range(3)
-    #]
+    # ]
     # ak8FatJetParTXbbvsQCD
-    + [
-        ShapeVar(
-            var=f"ak8FatJetParTXbbvsQCD{i}",
-            label=rf"ParT XbbvsQCD j{i+1}",
-            bins=[20, 0, 1],
-        )
-        for i in range(3)
-    ]
+    # + [
+    #    ShapeVar(
+    #        var=f"ak8FatJetParTXbbvsQCD{i}",
+    #        label=rf"ParT XbbvsQCD j{i+1}",
+    #        bins=[20, 0, 1],
+    #    )
+    #    for i in range(3)
+    # ]
     # ak8FatJetParTXbbvsQCDTop
-    + [
-        ShapeVar(
-            var=f"ak8FatJetParTXbbvsQCDTop{i}",
-            label=rf"ParT XbbvsQCDTop j{i+1}",
-            bins=[20, 0, 1],
-        )
-        for i in range(3)
-    ]
+    # + [
+    #    ShapeVar(
+    #        var=f"ak8FatJetParTXbbvsQCDTop{i}",
+    #        label=rf"ParT XbbvsQCDTop j{i+1}",
+    #        bins=[20, 0, 1],
+    #    )
+    #    for i in range(3)
+    # ]
     # ak8FatJetPNetXbbvsQCDLegacy
-    + [
-        ShapeVar(
-            var=f"ak8FatJetPNetXbbvsQCDLegacy{i}",
-            label=rf"PNet Legacy XbbvsQCD j{i+1}",
-            bins=[20, 0, 1],
-        )
-        for i in range(3)
-    ]
+    # + [
+    #    ShapeVar(
+    #        var=f"ak8FatJetPNetXbbvsQCDLegacy{i}",
+    #        label=rf"PNet Legacy XbbvsQCD j{i+1}",
+    #        bins=[20, 0, 1],
+    #    )
+    #    for i in range(3)
+    # ]
     #  nElectrons
-    + [ShapeVar(var="nElectrons", label=r"Number of Electrons", bins=[3, 0, 3])]
+    # + [ShapeVar(var="nElectrons", label=r"Number of Electrons", bins=[3, 0, 3])]
     #  nMuons
-    + [ShapeVar(var="nMuons", label=r"Number of Muons", bins=[3, 0, 3])]
+    # + [ShapeVar(var="nMuons", label=r"Number of Muons", bins=[3, 0, 3])]
     #  nTaus
-    + [ShapeVar(var="nTaus", label=r"Number of Taus", bins=[3, 0, 3])]
+    # + [ShapeVar(var="nTaus", label=r"Number of Taus", bins=[3, 0, 3])]
     #  nBoostedTaus
-    + [ShapeVar(var="nBoostedTaus", label=r"Number of Boosted Taus", bins=[3, 0, 3])]
+    # + [ShapeVar(var="nBoostedTaus", label=r"Number of Boosted Taus", bins=[3, 0, 3])]
 )
 
 # fitting on bb regressed mass
-#shape_vars = [
+#
+shape_vars = []
 #    ShapeVar(
 #        "bbFatJetPNetmassLegacy",
 #        r"$m^{bb}_\mathrm{Reg}$ [GeV]",
@@ -145,7 +149,7 @@ control_plot_vars = (
 #        reg=True,
 #        blind_window=[110, 140],
 #    )
-#]
+# ]
 
 
 def main(args: argparse.Namespace):
@@ -324,9 +328,9 @@ def get_columns(
         columns_data += [
             ("ak8FatJetPNetXbbLegacy", num_fatjets),
             ("ak8FatJetPNetQCDLegacy", num_fatjets),
-            #("ak8FatJetPNetmassLegacy", num_fatjets),
-            #("ak8FatJetParTmassResApplied", num_fatjets),
-            #("ak8FatJetParTmassVisApplied", num_fatjets),
+            # ("ak8FatJetPNetmassLegacy", num_fatjets),
+            # ("ak8FatJetParTmassResApplied", num_fatjets),
+            # ("ak8FatJetParTmassVisApplied", num_fatjets),
             ("ak8FatJetMsd", num_fatjets),
         ]
 
@@ -382,13 +386,13 @@ def load_samples(
     events_dict = {}
 
     samples = Samples.SAMPLES.copy()
-    #signals = Samples.SIGNALS.copy()
+    # signals = Samples.SIGNALS.copy()
 
     if load_just_bbtt:  # quite ad hoc but should become obsolete
         del samples["vbfbbtt-k2v0"]
         del samples["vbfbbtt"]
-        #signals.remove("vbfbbtt-k2v0")
-        #signals.remove("vbfbbtt")
+        # signals.remove("vbfbbtt-k2v0")
+        # signals.remove("vbfbbtt")
 
     # remove unnecessary data samples
     for key in Samples.DATASETS + (not load_bgs) * Samples.BGS:
@@ -422,7 +426,7 @@ def load_samples(
                 events_dict[key] = LoadedSample(sample=sample, events=events)
 
     # keep only the specified bbtt channel
-    '''
+    """
     for signal in signals:
         if not loaded_samples:
          # quick fix due to old naming still in samples
@@ -438,7 +442,7 @@ def load_samples(
                 ],
             )
             del events_dict[signal]
-    '''
+    """
     return events_dict
 
 
@@ -447,7 +451,7 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
     ldataset = channel.lepton_dataset
 
     # storing triggers fired per dataset
-    trigdict = { "tau": {}}
+    trigdict = {"tau": {}}
     if channel.isLepton:
         trigdict[ldataset] = {}
         lepton_triggers = utils.list_intersection(
@@ -455,9 +459,9 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
         )
 
     # JetMET triggers considered in this channel
-    #jet_triggers = utils.list_intersection(
+    # jet_triggers = utils.list_intersection(
     #    HLTs.hlts_by_dataset(year, "JetMET", data_only=True), channel.triggers(year, data_only=True)
-    #)
+    # )
 
     # Tau triggers considered in this channel
     tau_triggers = utils.list_intersection(
@@ -487,7 +491,7 @@ def apply_triggers_data_old(events_dict: dict[str, pd.DataFrame], year: str, cha
     # remove overlap
     # print(trigdict["jetmet"])
 
-    #events_dict["jetmet"] = events_dict["jetmet"][trigdict["jetmet"]["jets"]]
+    # events_dict["jetmet"] = events_dict["jetmet"][trigdict["jetmet"]["jets"]]
     events_dict["tau"] = events_dict["tau"][trigdict["tau"]["taunojets"]]
 
     return events_dict
@@ -520,7 +524,7 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
     ldataset = channel.lepton_dataset
 
     # storing triggers fired per dataset
-    trigdict = { "tau": {}}
+    trigdict = {"tau": {}}
     if channel.isLepton:
         trigdict[ldataset] = {}
         lepton_triggers = utils.list_intersection(
@@ -528,9 +532,9 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
         )
 
     # JetMET triggers considered in this channel
-    #jet_triggers = utils.list_intersection(
+    # jet_triggers = utils.list_intersection(
     #    HLTs.hlts_by_dataset(year, "JetMET", data_only=True), channel.triggers(year, data_only=True)
-    #)
+    # )
 
     # Tau triggers considered in this channel
     tau_triggers = utils.list_intersection(
@@ -545,7 +549,7 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
         d["taus"] = np.sum([events_dict[key].get_var(hlt) for hlt in tau_triggers], axis=0).astype(
             bool
         )
-        d["taunojets"] =  d["taus"]
+        d["taunojets"] = d["taus"]
 
         if key == "tau":
             continue
@@ -562,7 +566,7 @@ def apply_triggers_data(events_dict: dict[str, LoadedSample], year: str, channel
     # remove overlap
     # print(trigdict["jetmet"])
 
-    #events_dict["jetmet"].apply_selection(trigdict["jetmet"]["jets"])
+    # events_dict["jetmet"].apply_selection(trigdict["jetmet"]["jets"])
     events_dict["tau"].apply_selection(trigdict["tau"]["taunojets"])
 
     return events_dict
@@ -752,10 +756,6 @@ def control_plots(
     if sig_scale_dict is None:
         sig_scale_dict = {sig_key: 2e5 for sig_key in sigs}
 
-    print(control_plot_vars)
-    print(selection)
-    print(list(events_dict.keys()))
-
     for shape_var in control_plot_vars:
         if shape_var.var not in hists:
             hists[shape_var.var] = putils.singleVarHist(
@@ -878,7 +878,7 @@ def get_templates(
 
         if not do_jshift:
             print(rname)
-
+        print(region.cuts)
         # make selection, taking JEC/JMC variations into account
         sel, cf = utils.make_selection(
             region.cuts,
@@ -931,6 +931,7 @@ def get_templates(
         #                     hist_samples.append(f"{wsample}_{wshift}_{shift}")
 
         # histograms
+
         h = Hist(
             hist.axis.StrCategory(hist_samples + [data_key], name="Sample"),
             *[shape_var.axis for shape_var in shape_vars],

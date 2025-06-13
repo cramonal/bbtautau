@@ -13,30 +13,30 @@ from bbtautau.postprocessing.utils import Region
 
 
 def get_selection_regions(channel: Channel):
+    print(channel)
     regions = {
         # {label: {cutvar: [min, max], ...}, ...}
         "pass": Region(
             cuts={
-                "bbFatJetPt": [250, CUT_MAX_VAL],
-                "ttFatJetPt": [200, CUT_MAX_VAL],
-                f"ttFatJet{channel.tt_mass_cut[0]}": channel.tt_mass_cut[1],
-                "bbFatJetParTXbbvsQCD": [channel.txbb_cut, CUT_MAX_VAL],
-                f"ttFatJetParTX{channel.tagger_label}vsQCDTop": [channel.txtt_cut, CUT_MAX_VAL],
+                "ak8FatJetPt0": [200, CUT_MAX_VAL],
+                # "ttFatJetPt": [200, CUT_MAX_VAL],
+                # f"ttFatJet{channel.tt_mass_cut[0]}": channel.tt_mass_cut[1],
+                # "bbFatJetParTXbbvsQCD": [channel.txbb_cut, CUT_MAX_VAL],
+                # f"ttFatJetParTX{channel.tagger_label}vsQCDTop": [channel.txtt_cut, CUT_MAX_VAL],
             },
-            signal=True,
+            signal=False,
             label="Pass",
         ),
         "fail": Region(
             cuts={
-                "bbFatJetPt": [250, CUT_MAX_VAL],
-                "ttFatJetPt": [200, CUT_MAX_VAL],
-                f"ttFatJet{channel.tt_mass_cut[0]}": channel.tt_mass_cut[1],
+                "ak8FatJetPt0": [200, CUT_MAX_VAL],
+                # f"ttFatJet{channel.tt_mass_cut[0]}": channel.tt_mass_cut[1],
                 # invert at least one of the cuts
-                f"bbFatJetParTXbbvsQCD+ttFatJetParTX{channel.tagger_label}vsQCDTop": [
-                    [-CUT_MAX_VAL, channel.txbb_cut],
-                    [-CUT_MAX_VAL, channel.txtt_cut],
-                ],
-                f"ttFatJetParTX{channel.tagger_label}vsQCDTop": [0.3, CUT_MAX_VAL],
+                # f"bbFatJetParTXbbvsQCD+ttFatJetParTX{channel.tagger_label}vsQCDTop": [
+                #    [-CUT_MAX_VAL, channel.txbb_cut],
+                #    [-CUT_MAX_VAL, channel.txtt_cut],
+                # ],
+                # f"ttFatJetParTX{channel.tagger_label}vsQCDTop": [0.3, CUT_MAX_VAL],
             },
             signal=False,
             label="Fail",

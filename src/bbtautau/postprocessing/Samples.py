@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from boostedhh import hh_vars
 from boostedhh.utils import Sample
 
 from bbtautau.bbtautau_utils import Channel
@@ -13,9 +12,12 @@ CHANNELS = {
         data_samples=["tau"],
         isLepton=False,
         tagger_label="tauhtauh",
-        txbb_cut=0.907,
-        txtt_cut=0.990,
-        tt_mass_cut=("PNetmassLegacy", [50, 150]),
+        # txbb_cut=0.907,
+        txbb_cut=0,
+        # txtt_cut=0.990,
+        txtt_cut=0,
+        tt_mass_cut=("Msd", [0, 1000]),
+        # tt_mass_cut=("PNetmassLegacy", [50, 150]),
     ),
     "hm": Channel(
         key="hm",
@@ -45,22 +47,22 @@ CHANNELS = {
 
 # overall list of samples
 SAMPLES = {
-    #"jetmet": Sample(
+    # "jetmet": Sample(
     #    selector="^(JetHT|JetMET)",
     #    label="JetMET",
     #    isData=True,
-    #),
+    # ),
     "tau": Sample(
         selector="^Tau_Run",
         label="Tau",
         isData=True,
     ),
-    #"muon": Sample(
+    # "muon": Sample(
     #    selector="^Muon_Run",
     #    label="Muon",
     #    isData=True,
-    #),
-    #"egamma": Sample(
+    # ),
+    # "egamma": Sample(
     #    selector="^EGamma_Run",
     #    label="EGamma",
     #     isData=True,
@@ -100,26 +102,26 @@ SAMPLES = {
         label="Z+Jets",
         isSignal=False,
     ),
-    #"hbb": Sample(
+    # "hbb": Sample(
     #    selector="^(GluGluHto2B|VBFHto2B|WminusH_Hto2B|WplusH_Hto2B|ZH_Hto2B|ggZH_Hto2B)",
     #    label="Hbb",
     #    isSignal=False,
-    #),
-    #"bbtt": Sample(
+    # ),
+    # "bbtt": Sample(
     #    selector=hh_vars.bbtt_sigs["bbtt"],
     #    label=r"ggF HHbb$\tau\tau$",
     #    isSignal=True,
-    #),
-    #"vbfbbtt": Sample(
+    # ),
+    # "vbfbbtt": Sample(
     #    selector=hh_vars.bbtt_sigs["vbfbbtt"],
     #    label=r"VBF HHbb$\tau\tau$ (SM)",
     #    isSignal=True,
-    #),
-    #"vbfbbtt-k2v0": Sample(
+    # ),
+    # "vbfbbtt-k2v0": Sample(
     #    selector=hh_vars.bbtt_sigs["vbfbbtt-k2v0"],
     #    label=r"VBF HHbb$\tau\tau$ ($\kappa_{2V}=0$)",
     #    isSignal=True,
-    #),
+    # ),
 }
 
 SIGNALS = ["bbtt", "vbfbbtt", "vbfbbtt-k2v0"]
@@ -148,7 +150,7 @@ BGS = [
     "dyjets",
     "wjets",
     "zjets",
-    #"hbb",
+    # "hbb",
 ]
 
 single_h_keys = []
