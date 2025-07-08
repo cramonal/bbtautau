@@ -53,10 +53,10 @@ def gen_selection_Ztautau(
 
 
     Z = genparts[genparts.pdgId == PDGID.Z]
-
+    print("Z", Z)
     # saving 4-vector info
-    GenZVars = {f"GenZ{key}": Z[var].to_numpy() for (var, key) in P4.items()}
-
+    #GenZVars = {f"GenZ{key}": Z[var].to_numpy() for (var, key) in P4.items()}
+    GenZVars = {f"GenZ{key}": ak.to_numpy(ak.pad_none(Z[var], 1, clip=True))  for (var, key) in P4.items()}
    
     Z_children = Z.children
     # pad_val is necessary to avoid a numpy MaskedArray even though all events have exactly 2 Higgs'
@@ -72,7 +72,7 @@ def gen_selection_Ztautau(
     if selection_args is not None:
         add_selection("has_tautau",  has_tt, *selection_args)
 
-    taus = higgs_children[is_tt]
+    taus = Z_children[is_tt]
     flat_taus = ak.flatten(taus, axis=2)
     GenTauVars = {f"GenTau{key}": pad_val(flat_taus[var], 2, axis=1) for (var, key) in P4.items()}
 
@@ -90,10 +90,18 @@ def gen_selection_Ztautau(
     GenTauVars["GenTauhh"] = (tauh == 2).to_numpy()
     GenTauVars["GenTauhm"] = ((tauh == 1) & (taumu == 1)).to_numpy()
     GenTauVars["GenTauhe"] = ((tauh == 1) & (taue == 1)).to_numpy()
+    #dR fatjet and gen tau
+    Ztt = Z[ak.sum(is_tt, axis=2) == 2]
+    Ztt = ak.pad_none(Ztt, 1, axis=1, clip=True)[:, 0]
+    ttdr = fatjets[:, :2].delta_r(Ztt).to_numpy()
+    
+    GenMatchingVars = {
+         "ak8FatJetZttdR": ttdr,
+     }
+
+    return {**GenZVars,  **GenTauVars , **GenMatchingVars}
 
 
-
-    return {**GenZVars,  **GenTauVars}  # , **GenMatchingVars}
 
 
 
@@ -108,7 +116,7 @@ def gen_selection_HHbbtautau(
 
     # finding the two gen higgs
     higgs = genparts[genparts.pdgId == PDGID.H]
-
+    print("H",higgs)
     # saving 4-vector info
     GenHiggsVars = {f"GenHiggs{key}": higgs[var].to_numpy() for (var, key) in P4.items()}
 
@@ -188,6 +196,7 @@ def gen_selection_HH4b(
 
     # finding the two gen higgs
     higgs = genparts[genparts.pdgId == PDGID.H]
+    print("H", higgs)
     GenHiggsVars = {f"GenHiggs{key}": higgs[var].to_numpy() for (var, key) in P4.items()}
     higgs_children = higgs.children
     is_bb = np.abs(higgs_children.pdgId) == PDGID.b

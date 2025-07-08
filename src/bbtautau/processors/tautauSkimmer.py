@@ -41,7 +41,8 @@ from . import GenSelection, objects
 gen_selection_dict = {
     #"HHto4B": GenSelection.gen_selection_HH4b,
     #"HHto2B2Tau": GenSelection.gen_selection_HHbbtautau,
-    "ZTauTau":  GenSelection.gen_selection_Ztautau,
+    "Zto":  GenSelection.gen_selection_Ztautau,
+    "DYto": GenSelection.gen_selection_Ztautau,
 }
 
 logger = logging.getLogger(__name__)
@@ -531,13 +532,23 @@ class tautauSkimmer(SkimmerABC):
         #                         vbf_jets[shift][vari][var], 2, axis=1
         #                     )
 
+
+
+        # Boolean mask: True where btagDeepFlavB > 0.3
+        btag_mask = ak4_jets_awayfromak8["btagDeepFlavB"] > 0.3
+
+        # For each event, check if **any** jet satisfies the condition
+        ak4JetAwayVars = {
+                f"AK4JetAway_nbtag": pad_val(ak.sum(btag_mask, axis = 1),len(ak.sum(btag_mask, axis = 1)),axis=0)
+            }
+
         skimmed_events = {
             **genVars,
             **eventVars,
             **pileupVars,
             **trigMatchVars,
             **HLTVars,
-            # **ak4JetAwayVars,
+            **ak4JetAwayVars,
             **leptonVars,
             **ak4JetVars,
             **ak8FatJetVars,
@@ -585,7 +596,6 @@ class tautauSkimmer(SkimmerABC):
         add_selection("ak4_jetveto", cut_jetveto, *selection_args)
 
         # # 0b ak4 jets outside fatjet 
-        print("bway",ak4_jets_awayfromak8.btagDeepFlavB)
         '''
         if len(ak4_jets_awayfromak8) == 2:
             ak4JetAwayVars = {
@@ -603,14 +613,12 @@ class tautauSkimmer(SkimmerABC):
             }
         '''
         # Boolean mask: True where btagDeepFlavB > 0.3
-        btag_mask = ak4_jets_awayfromak8["btagDeepFlavB"] > 0.3
 
         # For each event, check if **any** jet satisfies the condition
         has_btagged_jet = ak.any(btag_mask, axis=1)
-        print("has",~has_btagged_jet)
-        #idx = np.where(ak4JetAwayVars["AK4JetAway_btag"] > 0.3)
-        #print(ak4JetAwayVars["AK4JetAway_btag"][idx])
         add_selection("ak4_b_numjets", ~has_btagged_jet, *selection_args)
+        
+
 
         # >=1 AK8 jets with pT cut (230 GeV by default)
         if self.fatjet_selection["pt"] >= 0:  # if < 0, don't apply any fatjet selection
@@ -622,9 +630,6 @@ class tautauSkimmer(SkimmerABC):
         # # >=1 AK8 jets with mSD >= 40 GeV
         # cut_mass = np.sum(ak8FatJetVars["ak8FatJetMsd"] >= 40, axis=1) >= 1
         # add_selection("ak8_mass", cut_mass, *selection_args)
-        print("elec",veto_electrons)
-        print("mu",veto_muons)
-        print(len(veto_electrons),len(ak.num(veto_electrons, axis=1)==0))
         # Veto leptons
         add_selection(
              "0lep",
