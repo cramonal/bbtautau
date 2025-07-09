@@ -53,7 +53,6 @@ def gen_selection_Ztautau(
 
 
     Z = genparts[genparts.pdgId == PDGID.Z]
-    print("Z", Z)
     # saving 4-vector info
     #GenZVars = {f"GenZ{key}": Z[var].to_numpy() for (var, key) in P4.items()}
     GenZVars = {f"GenZ{key}": ak.to_numpy(ak.pad_none(Z[var], 1, clip=True))  for (var, key) in P4.items()}
@@ -63,9 +62,8 @@ def gen_selection_Ztautau(
     GenZVars["GenZChildren"] = pad_val(Z_children.pdgId[:, :, 0], 2, axis=1)
 
     # finding bb and VV children
-
     is_tt = np.abs(Z_children.pdgId) == PDGID.tau
-
+    print("a",np.any(is_tt))
     # checking that there are 2 bs and 2 taus
 
     has_tt = ak.sum(ak.flatten(is_tt, axis=2), axis=1) == 2
@@ -93,8 +91,7 @@ def gen_selection_Ztautau(
     #dR fatjet and gen tau
     Ztt = Z[ak.sum(is_tt, axis=2) == 2]
     Ztt = ak.pad_none(Ztt, 1, axis=1, clip=True)[:, 0]
-    ttdr = fatjets[:, :2].delta_r(Ztt).to_numpy()
-    
+    ttdr = pad_val(fatjets[:, :2].delta_r(Ztt),2, axis=1)
     GenMatchingVars = {
          "ak8FatJetZttdR": ttdr,
      }
