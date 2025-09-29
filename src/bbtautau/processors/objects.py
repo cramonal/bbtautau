@@ -53,6 +53,22 @@ def get_ak8jets(fatjets: FatJetArray, nano_version: str):
     fatjets["particleNetLegacy_XbbvsQCD"] = fatjets.particleNetLegacy_Xbb / (
         fatjets.particleNetLegacy_Xbb + fatjets.particleNetLegacy_QCD
     )
+    '''
+    fatjets["globalParT_QCD"] = (
+        fatjets.globalParT_QCD0HF + fatjets.globalParT_QCD1HF + fatjets.globalParT_QCD2HF
+    )
+    fatjets["globalParT_Top"] = fatjets.globalParT_TopW + fatjets.globalParT_TopbW
+    '''
+    fatjets["particleNetLegacy_XbbvsQCD"] = fatjets.particleNetLegacy_Xbb / (
+        fatjets.particleNetLegacy_Xbb + fatjets.particleNetLegacy_QCD
+    )
+    '''
+    fatjets["globalParT_XbbvsQCD"] = fatjets.globalParT_Xbb / (
+        fatjets.globalParT_Xbb + fatjets["globalParT_QCD"]
+    )
+    fatjets["globalParT_XbbvsQCDTop"] = fatjets.globalParT_Xbb / (
+        fatjets.globalParT_Xbb + fatjets["globalParT_QCD"] + fatjets["globalParT_Top"]
+    )
 
     if nano_version.startswith("v12"):
         fatjets["globalParT_QCD"] = (
@@ -120,6 +136,15 @@ def get_ak8jets(fatjets: FatJetArray, nano_version: str):
             fatjets.globalParT3_massCorrGeneric * (1 - fatjets.rawFactor) * fatjets.mass
         )
 
+    fatjets["globalParT_massResCorr"] = fatjets.globalParT_massRes
+    fatjets["globalParT_massVisCorr"] = fatjets.globalParT_massVis
+    fatjets["globalParT_massResApplied"] = (
+        fatjets.globalParT_massRes * (1 - fatjets.rawFactor) * fatjets.mass
+    )
+    fatjets["globalParT_massVisApplied"] = (
+        fatjets.globalParT_massVis * (1 - fatjets.rawFactor) * fatjets.mass
+    )
+    '''
     return fatjets
 
 
