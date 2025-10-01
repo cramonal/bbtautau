@@ -54,6 +54,7 @@ def get_ak8jets(fatjets: FatJetArray, nano_version: str):
         fatjets.particleNetLegacy_Xbb + fatjets.particleNetLegacy_QCD
     )
     '''
+    
     fatjets["globalParT_QCD"] = (
         fatjets.globalParT_QCD0HF + fatjets.globalParT_QCD1HF + fatjets.globalParT_QCD2HF
     )
