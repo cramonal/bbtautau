@@ -18,6 +18,7 @@ from coffea.nanoevents.methods.nanoaod import (
     MissingET,
     MuonArray,
     TauArray,
+    MissingET,
 )
 
 from bbtautau.HLTs import HLTs
@@ -531,6 +532,7 @@ def CA_got(
     tau0_pt,
     tau1_pt,
 ):
+def CA_got(met_pt, met_phi, fatjets_mass, fatjets_masscorr, tau0_eta, tau1_eta, tau0_phi, tau1_phi, tau0_pt, tau1_pt):
     invalid = (
         (met_pt == -999)
         | (met_phi == -999)
@@ -568,6 +570,7 @@ def CA_got(
     return mass
 
 
+<<<<<<< HEAD
 def calculate_invariant_mass(
     fatjets_mass,
     fatjets_pt,
@@ -988,7 +991,6 @@ def get_CA_MASS(
 
         # for subjet
 
-        ##fatjet_subjet matching
         fatjet_subjet_pairs = ak.cartesian([fatjets, subjets], nested=True)
         fatjets_in_pairs = fatjet_subjet_pairs["0"]
         subjets_in_pairs = fatjet_subjet_pairs["1"]
@@ -1009,10 +1011,7 @@ def get_CA_MASS(
         sorted_subjets = matched_subjets_per_fatjet[sorted_indices]
         top2_subjets = ak.pad_none(sorted_subjets, 2, axis=-1)[..., :2]
 
-        subjet0_eta = ak.fill_none(top2_subjets.eta[..., 0], -999)
-        subjet1_eta = ak.fill_none(top2_subjets.eta[..., 1], -999)
-        subjet0_phi = ak.fill_none(top2_subjets.phi[..., 0], -999)
-        subjet1_phi = ak.fill_none(top2_subjets.phi[..., 1], -999)
+
         subjet0_mass = ak.fill_none(top2_subjets.mass[..., 0], -999)
         subjet1_mass = ak.fill_none(top2_subjets.mass[..., 1], -999)
         subjet0_pt = ak.fill_none(top2_subjets.pt[..., 0], -999)
@@ -1050,6 +1049,7 @@ def get_CA_MASS(
         sorted_indices = ak.argsort(matched_taus_per_fatjet.pt, axis=-1, ascending=False)
         sorted_taus = matched_taus_per_fatjet[sorted_indices]
         top2_taus = ak.pad_none(sorted_taus, 2, axis=-1)[..., :2]
+
 
         tau0_eta = ak.fill_none(top2_taus.eta[..., 0], -999)
         tau1_eta = ak.fill_none(top2_taus.eta[..., 1], -999)
