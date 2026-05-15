@@ -41,6 +41,87 @@ def _iterate_children(children, parent_pdgId):
 def _sum_taus(taut):
     return ak.sum(taut, axis=1)
 
+def gen_selection_Zll(
+    events: NanoEventsArray,
+    fatjets: FatJetArray,  # noqa: ARG001
+    selection_args: list,
+):
+    """Gets Z -> ee / mumu 4-vectors + lepton decay information"""
+    print("-----------------------GEN FOR LEP---------------------------")
+
+    genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
+
+    # Select Z bosons
+    Z = genparts[genparts.pdgId == PDGID.Z]
+
+    # Save Z 4-vector info
+    GenZVars = {
+        f"GenZ{key}": ak.to_numpy(ak.pad_none(Z[var], 1, clip=True))
+        for (var, key) in P4.items()
+    }
+
+    # Z children
+    Z_children = Z.children
+
+    # Save children pdgIds
+    GenZVars["GenZChildren"] = pad_val(
+        Z_children.pdgId[:, :, 0], 2, axis=1
+    )
+
+    # Identify electrons and muons
+    is_ee = np.abs(Z_children.pdgId) == PDGID.e
+    is_mumu = np.abs(Z_children.pdgId) == PDGID.mu
+
+    # Event selections
+    has_ee = ak.sum(ak.flatten(is_ee, axis=2), axis=1) == 2
+    has_mumu = ak.sum(ak.flatten(is_mumu, axis=2), axis=1) == 2
+
+    if selection_args is not None:
+        add_selection("has_ee", has_ee, *selection_args)
+        add_selection("has_mumu", has_mumu, *selection_args)
+
+    # Extract leptons
+    electrons = Z_children[is_ee]
+    muons = Z_children[is_mumu]
+
+    flat_electrons = ak.flatten(electrons, axis=2)
+    flat_muons = ak.flatten(muons, axis=2)
+
+    # Save electron variables
+    GenElectronVars = {
+        f"GenElectron{key}": pad_val(flat_electrons[var], 2, axis=1)
+        for (var, key) in P4.items()
+    }
+
+    # Save muon variables
+    GenMuonVars = {
+        f"GenMuon{key}": pad_val(flat_muons[var], 2, axis=1)
+        for (var, key) in P4.items()
+    }
+
+    # Z->ee object for matching
+    Zee = Z[ak.sum(is_ee, axis=2) == 2]
+    Zee = ak.pad_none(Zee, 1, axis=1, clip=True)[:, 0]
+
+    # Z->mumu object for matching
+    Zmumu = Z[ak.sum(is_mumu, axis=2) == 2]
+    Zmumu = ak.pad_none(Zmumu, 1, axis=1, clip=True)[:, 0]
+
+    # deltaR matching with AK8 fatjets
+    eedr = pad_val(fatjets[:, :2].delta_r(Zee), 2, axis=1)
+    mumudr = pad_val(fatjets[:, :2].delta_r(Zmumu), 2, axis=1)
+
+    GenMatchingVars = {
+        "ak8FatJetZeedR": eedr,
+        "ak8FatJetZmumudR": mumudr,
+    }
+
+    return {
+        **GenZVars,
+        **GenElectronVars,
+        **GenMuonVars,
+        **GenMatchingVars,
+    }
 
 def gen_selection_Ztautau(
     events: NanoEventsArray,
@@ -48,7 +129,7 @@ def gen_selection_Ztautau(
     selection_args: list,
 ):
     """Gets Z and tautau 4-vectors + tau decay information"""
-
+    print("-----------------------GEN FOR TAU TAU---------------------------")
     genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
 
 

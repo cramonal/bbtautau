@@ -41,7 +41,8 @@ from . import GenSelection, objects
 gen_selection_dict = {
     #"HHto4B": GenSelection.gen_selection_HH4b,
     #"HHto2B2Tau": GenSelection.gen_selection_HHbbtautau,
-    "DYto": GenSelection.gen_selection_Ztautau,
+    "DYto2Tau": GenSelection.gen_selection_Ztautau,
+    "DY2Tau": GenSelection.gen_selection_Zll
 }
 
 logger = logging.getLogger(__name__)
