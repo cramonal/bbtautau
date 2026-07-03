@@ -62,7 +62,6 @@ def gen_selection_Zll(
 
     # Z children
     Z_children = Z.children
-
     # Save children pdgIds
     GenZVars["GenZChildren"] = pad_val(
         Z_children.pdgId[:, :, 0], 2, axis=1
@@ -75,10 +74,9 @@ def gen_selection_Zll(
     # Event selections
     has_ee = ak.sum(ak.flatten(is_ee, axis=2), axis=1) == 2
     has_mumu = ak.sum(ak.flatten(is_mumu, axis=2), axis=1) == 2
-
+    has_ll = has_ee | has_mumu
     if selection_args is not None:
-        add_selection("has_ee", has_ee, *selection_args)
-        add_selection("has_mumu", has_mumu, *selection_args)
+        add_selection("has_ll", has_ll, *selection_args)
 
     # Extract leptons
     electrons = Z_children[is_ee]

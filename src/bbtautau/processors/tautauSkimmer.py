@@ -42,7 +42,7 @@ gen_selection_dict = {
     #"HHto4B": GenSelection.gen_selection_HH4b,
     #"HHto2B2Tau": GenSelection.gen_selection_HHbbtautau,
     "DYto2Tau": GenSelection.gen_selection_Ztautau,
-    "DY2Tau": GenSelection.gen_selection_Zll
+    "DYto2L": GenSelection.gen_selection_Zll
 }
 
 logger = logging.getLogger(__name__)
@@ -161,7 +161,6 @@ class tautauSkimmer(SkimmerABC):
         super().__init__()
 
         self.XSECS = xsecs if xsecs is not None else {}  # in pb
-
         # HLT selection
         self.HLTs = {"signal": HLTs.hlt_list(hlt_prefix=False)}
         self.HLTs = self.HLTs[region]
