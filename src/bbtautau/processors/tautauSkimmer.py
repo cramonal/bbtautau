@@ -157,6 +157,7 @@ class tautauSkimmer(SkimmerABC):
         nano_version: str = "v12_private",
         fatjet_pt_cut: float = None,
         fatjet_bb_preselection: bool = False,
+        prescale_factor: int = None,
     ):
         super().__init__()
 
@@ -169,77 +170,171 @@ class tautauSkimmer(SkimmerABC):
         self._region = region
         self._accumulator = processor.dict_accumulator({})
         self._fatjet_bb_preselection = fatjet_bb_preselection
-
+        self._prescale_factor = prescale_factor
         # JMSR
-        self.jmsr_vars = ["msoftdrop"] #"particleNet_mass_legacy", "ParTmassVis", "ParTmassRes"]
-
-        # particlenet legacy variables
+        self.jmsr_vars = ["msoftdrop", "particleNet_mass_legacy", "ParTmassVis", "ParTmassRes"]
+        # particlenet NOT legacy variables
         pnet_vars = [
-            "Xbb",
-            "QCD",
-            "QCDb",
-            "QCDbb",
-            "QCDcc",
-            "QCDc",
-            "QCDothers",
-            "XbbvsQCD",
-            "mass",
+            "XbbVsQCD",
+            "XteVsQCD",
+            "XtmVsQCD",
+            "XttVsQCD",
         ]
-        #self.skim_vars["FatJet"] = {
-        #    **self.skim_vars["FatJet"],
-        #    **{f"particleNetLegacy_{var}": f"PNet{var}Legacy" for var in pnet_vars},
-        #}
-
-        # glopart variables
-        glopart_vars = [
-           # "QCD1HF",
-           # "QCD2HF",
-           # "QCD0HF",
-           # "TopW",
-           # "TopbW",
-           # "TopbWev",
-           # "TopbWmv",
-           # "TopbWtauhv",
-           # "TopbWq",
-           # "TopbWqq",
-           # "Xbb",
-           # "Xcc",
-           # "Xcs",
-           # "Xgg",
-           # "Xqq",
-            "Xtauhtaue",
-            "Xtauhtauh",
-            "Xtauhtaum",
-            # Derived variables
-            "massResCorr",
-            "massVisCorr",
-            "massResApplied",
-            "massVisApplied",
-            "QCD",
-            "Top",
-            "XbbvsQCD",
-            "XbbvsQCDTop",
-            "XtauhtauevsQCD",
-            "XtauhtauevsQCDTop",
-            "XtauhtaumvsQCD",
-            "XtauhtaumvsQCDTop",
-            "XtauhtauhvsQCD",
-            "XtauhtauhvsQCDTop",
-        ]
-
         self.skim_vars["FatJet"] = {
             **self.skim_vars["FatJet"],
-            **{f"globalParT_{var}": f"ParT{var}" for var in glopart_vars},
+            **{f"particleNet_{var}": f"PNet{var}" for var in pnet_vars},
         }
 
-        #CA variables
+        # 2022+2023, v12, more QCD/Top/ParTs var
+        if nano_version.startswith("v12"):
+
+            pnet_vars_legacy = [
+                "Xbb",
+                "QCD",
+                "QCDb",
+                "QCDbb",
+                "QCDcc",
+                "QCDc",
+                "QCDothers",
+                "XbbvsQCD",
+                "mass",
+            ]
+            self.skim_vars["FatJet"] = {
+                **self.skim_vars["FatJet"],
+                **{f"particleNetLegacy_{var}": f"PNet{var}Legacy" for var in pnet_vars_legacy},
+            }
+
+            # glopart variables
+            glopart_vars = [
+                "QCD1HF",
+                "QCD2HF",
+                "QCD0HF",
+                "TopW",
+                "TopbW",
+                "TopbWev",
+                "TopbWmv",
+                "TopbWtauhv",
+                "TopbWq",
+                "TopbWqq",
+                "Xbb",
+                "Xcc",
+                "Xcs",
+                "Xgg",
+                "Xqq",
+                "Xtauhtaue",
+                "Xtauhtauh",
+                "Xtauhtaum",
+                # Derived variables
+                "massResCorr",
+                "massVisCorr",
+                "massResApplied",
+                "massVisApplied",
+                "QCD",
+                "Top",
+                "XbbvsQCD",
+                "XbbvsQCDTop",
+                "XtauhtauevsQCD",
+                "XtauhtauevsQCDTop",
+                "XtauhtaumvsQCD",
+                "XtauhtaumvsQCDTop",
+                "XtauhtauhvsQCD",
+                "XtauhtauhvsQCDTop",
+                "XtauhtauevsQCDOtherTau",
+                "XtauhtauevsQCDTopOtherTau",
+                "XtauhtaumvsQCDOtherTau",
+                "XtauhtaumvsQCDTopOtherTau",
+                "XtauhtauhvsQCDOtherTau",
+                "XtauhtauhvsQCDTopOtherTau",
+                "XtauhtauevsTopOtherTau",
+                "XtauhtaumvsTopOtherTau",
+                "XtauhtauhvsTopOtherTau",
+            ]
+
+            self.skim_vars["FatJet"] = {
+                **self.skim_vars["FatJet"],
+                **{f"globalParT_{var}": f"ParT{var}" for var in glopart_vars},
+            }
+
+        elif nano_version.startswith("v15"):
+
+            pnet_vars_legacy = [
+                "Xbb",
+                "QCD",
+                "XbbvsQCD",
+                "mass",
+            ]
+            self.skim_vars["FatJet"] = {
+                **self.skim_vars["FatJet"],
+                **{f"particleNetLegacy_{var}": f"PNet{var}Legacy" for var in pnet_vars_legacy},
+            }
+
+            # glopart variables
+            glopart_vars = [
+                "TopbWev",
+                "TopbWmv",
+                "TopbWq",
+                "TopbWqq",
+                "TopbWtauhv",
+                "Xbb",
+                "Xcc",
+                "Xcs",
+                "Xqq",
+                "Xtauhtaue",
+                "Xtauhtauh",
+                "Xtauhtaum",
+                # Derived variables
+                "massResCorr",
+                "massVisCorr",
+                "massResApplied",
+                "massVisApplied",
+                "QCD",
+                "Top",
+                "XbbvsQCD",
+                "XbbvsQCDTop",
+                "XtauhtauevsQCD",
+                "XtauhtauevsQCDTop",
+                "XtauhtaumvsQCD",
+                "XtauhtaumvsQCDTop",
+                "XtauhtauhvsQCD",
+                "XtauhtauhvsQCDTop",
+            ]
+
+            self.skim_vars["FatJet"] = {
+                **self.skim_vars["FatJet"],
+                **{f"globalParT_{var}": f"ParT{var}" for var in glopart_vars},
+            }
+
+        # CA variables
         ca_vars = [
+            "tau_number",
+            "tau_number_in_fatjet",
+            "globalParT_massVisApplied_oneHPSTau",
+            "globalParT_massVisApplied_oneHPSTau_thth",
+            "globalParT_massVisApplied_oneHPSTauorMuon_thtm",
+            "globalParT_massVisApplied_oneHPSTauorElectron_thte",
+            "globalParT_massVisApplied_with_delta_axis_merged",
+            "globalParT_massVisApplied_oneHPSTauorLepton_flag",
+            "globalParT_massVisApplied_000_fatjetwithMET",
+            "globalParT_massVisApplied_000_fatjet",
+            "globalParT_massVisApplied_000_fatjet_MET_with_same_dirc",
+            "mass_merged",
+            "msoftdrop_merged",
+            "globalParT_massVisApplied_merged",
+            "globalParT_massResApplied_merged",
+            "particleNet_mass_legacy_merged",
+            "Tauflag",
+            "one_elec_in_fatjet",
+            "one_muon_in_fatjet",
+            "one_elec",
+            "one_muon",
+            "mass_fatjet_et",
+            "mass_fatjet_mt",
+            "isDauTau",
             "mass",
             "msoftdrop",
             "globalParT_massVisApplied",
             "globalParT_massResApplied",
             "particleNet_mass_legacy",
-            "isDauTau",
             "dau0_pt",
             "dau1_pt",
             "dau0_eta",
@@ -252,13 +347,57 @@ class tautauSkimmer(SkimmerABC):
             "mass_subjets",
             "mass_boostedtaus",
             "nsubjets_perfatjets",
+            "mass_fatjets",
+            "mass_mt",
+            "msoftdrop_mt",
+            "globalParT_massVisApplied_mt",
+            "globalParT_massResApplied_mt",
+            "particleNet_mass_legacy_mt",
+            "isDauTau_mt",
+            "dau0_pt_mt",
+            "dau1_pt_mt",
+            "dau0_eta_mt",
+            "dau1_eta_mt",
+            "dau0_phi_mt",
+            "dau1_phi_mt",
+            "dau0_mass_mt",
+            "dau1_mass_mt",
+            "ntaus_perfatjets_mt",
+            "mass_subjets_mt",
+            "mass_boostedtaus_mt",
+            "nsubjets_perfatjets_mt",
+            "mass_subjets_mt_01",
+            "muon_subjet_dr02",
+            "mass_subjets_mt_1",
+            "mass_subjets_mt_0",
+            "mass_et",
+            "msoftdrop_et",
+            "globalParT_massVisApplied_et",
+            "globalParT_massResApplied_et",
+            "particleNet_mass_legacy_et",
+            "isDauTau_et",
+            "dau0_pt_et",
+            "dau1_pt_et",
+            "dau0_eta_et",
+            "dau1_eta_et",
+            "dau0_phi_et",
+            "dau1_phi_et",
+            "dau0_mass_et",
+            "dau1_mass_et",
+            "ntaus_perfatjets_et",
+            "mass_subjets_et",
+            "mass_boostedtaus_et",
+            "nsubjets_perfatjets_et",
+            "mass_subjets_et_01",
+            "elec_subjet_dr02",
+            "mass_subjets_et_1",
+            "mass_subjets_et_0",
         ]
 
         self.skim_vars["FatJet"] = {
             **self.skim_vars["FatJet"],
             **{f"CA_{var}": f"CA{var}" for var in ca_vars},
         }
-
 
         # update fatjet pT cut
         if fatjet_pt_cut is not None:
@@ -268,6 +407,7 @@ class tautauSkimmer(SkimmerABC):
             f"Running skimmer with:\nsystematics {self._systematics}\nregion {self._region}\nfatjet pt cut {self.fatjet_selection['pt']}"
         )
 
+    
     @property
     def accumulator(self):
         return self._accumulator
@@ -362,7 +502,7 @@ class tautauSkimmer(SkimmerABC):
 
         # AK8 Jets
         num_ak8_jets = 3
-        fatjets = objects.get_ak8jets(events.FatJet)  # this adds all our extra variables e.g. TXbb
+        fatjets = objects.get_ak8jets(events.FatJet, nano_version=self._nano_version)  # this adds all our extra variables e.g. TXbb
         fatjets, jec_shifted_fatjetvars = JEC_loader.get_jec_jets(
             events,
             fatjets,
@@ -395,6 +535,7 @@ class tautauSkimmer(SkimmerABC):
              events,
              **self.ak4_bjet_selection,
              **self.ak4_bjet_lepton_selection,
+             sort_by = "btag_all"
          )
         
         # # JMSR
@@ -408,7 +549,7 @@ class tautauSkimmer(SkimmerABC):
         #     isData=isData,
         # )
 
-        fatjets = objects.get_CA_MASS(fatjets, boostedtaus, met, subjets)
+        fatjets = objects.get_CA_MASS(fatjets, taus, met, subjets, muons, electrons)
         print("CA mass", f"{time.time() - start:.2f}")
 
         #########################
