@@ -5,7 +5,6 @@ Author(s): Raghav Kansal
 """
 
 from __future__ import annotations
-
 import awkward as ak
 import numpy as np
 from boostedhh.processors.utils import (
@@ -50,10 +49,9 @@ def gen_selection_Zll(
     print("-----------------------GEN FOR LEP---------------------------")
 
     genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
-
+    
     # Select Z bosons
     Z = genparts[genparts.pdgId == PDGID.Z]
-
     # Save Z 4-vector info
     GenZVars = {
         f"GenZ{key}": ak.to_numpy(ak.pad_none(Z[var], 1, clip=True))
@@ -67,42 +65,47 @@ def gen_selection_Zll(
         Z_children.pdgId[:, :, 0], 2, axis=1
     )
 
+    #save if not Z mother
+    g_leptons = genparts[
+        (abs(genparts.pdgId) == 11) |
+        (abs(genparts.pdgId) == 13)
+        ]
     # Identify electrons and muons
-    is_ee = np.abs(Z_children.pdgId) == PDGID.e
-    is_mumu = np.abs(Z_children.pdgId) == PDGID.mu
+    is_Zee = np.abs(Z_children.pdgId) == PDGID.e
+    is_Zmumu = np.abs(Z_children.pdgId) == PDGID.mu
+    is_ee = np.abs(g_leptons.pdgId) == PDGID.e
+    is_mumu = np.abs(g_leptons.pdgId) == PDGID.mu
 
     # Event selections
-    has_ee = ak.sum(ak.flatten(is_ee, axis=2), axis=1) == 2
-    has_mumu = ak.sum(ak.flatten(is_mumu, axis=2), axis=1) == 2
+    has_ee = ak.sum(is_ee, axis=1) == 2
+    has_mumu = ak.sum(is_mumu, axis=1) == 2
     has_ll = has_ee | has_mumu
     if selection_args is not None:
         add_selection("has_ll", has_ll, *selection_args)
 
     # Extract leptons
-    electrons = Z_children[is_ee]
-    muons = Z_children[is_mumu]
 
-    flat_electrons = ak.flatten(electrons, axis=2)
-    flat_muons = ak.flatten(muons, axis=2)
+    electrons = genparts[is_ee]
+    muons = genparts[is_mumu]
 
     # Save electron variables
     GenElectronVars = {
-        f"GenElectron{key}": pad_val(flat_electrons[var], 2, axis=1)
+        f"GenElectron{key}": pad_val(electrons[var], 2, axis=1)
         for (var, key) in P4.items()
     }
 
     # Save muon variables
     GenMuonVars = {
-        f"GenMuon{key}": pad_val(flat_muons[var], 2, axis=1)
+        f"GenMuon{key}": pad_val(muons[var], 2, axis=1)
         for (var, key) in P4.items()
     }
 
     # Z->ee object for matching
-    Zee = Z[ak.sum(is_ee, axis=2) == 2]
+    Zee = Z[ak.sum(is_Zee, axis=2) == 2]
     Zee = ak.pad_none(Zee, 1, axis=1, clip=True)[:, 0]
 
     # Z->mumu object for matching
-    Zmumu = Z[ak.sum(is_mumu, axis=2) == 2]
+    Zmumu = Z[ak.sum(is_Zmumu, axis=2) == 2]
     Zmumu = ak.pad_none(Zmumu, 1, axis=1, clip=True)[:, 0]
 
     # deltaR matching with AK8 fatjets
@@ -132,6 +135,8 @@ def gen_selection_Ztautau(
 
 
     Z = genparts[genparts.pdgId == PDGID.Z]
+
+
     # saving 4-vector info
     #GenZVars = {f"GenZ{key}": Z[var].to_numpy() for (var, key) in P4.items()}
     GenZVars = {f"GenZ{key}": ak.to_numpy(ak.pad_none(Z[var], 1, clip=True))  for (var, key) in P4.items()}
@@ -139,21 +144,25 @@ def gen_selection_Ztautau(
     Z_children = Z.children
     # pad_val is necessary to avoid a numpy MaskedArray even though all events have exactly 2 Higgs'
     GenZVars["GenZChildren"] = pad_val(Z_children.pdgId[:, :, 0], 2, axis=1)
-
-    # finding bb and VV children
-    is_tt = np.abs(Z_children.pdgId) == PDGID.tau
-    print("a",np.any(is_tt))
+    #no z mother
+    g_leptons = genparts[  
+        (abs(genparts.pdgId) == 15) 
+        ]
+    # Identify taus
+    
+    is_tt = np.abs(g_leptons.pdgId) == PDGID.tau
     # checking that there are 2 bs and 2 taus
+   
+    has_tt = ak.sum(is_tt, axis=1) == 2
+    
 
-    has_tt = ak.sum(ak.flatten(is_tt, axis=2), axis=1) == 2
     if selection_args is not None:
         add_selection("has_tautau",  has_tt, *selection_args)
 
-    taus = Z_children[is_tt]
-    flat_taus = ak.flatten(taus, axis=2)
-    GenTauVars = {f"GenTau{key}": pad_val(flat_taus[var], 2, axis=1) for (var, key) in P4.items()}
+    taus = g_leptons[is_tt]
+    GenTauVars = {f"GenTau{key}": pad_val(taus[var], 2, axis=1) for (var, key) in P4.items()}
 
-    tau_children = ak.flatten(taus.children, axis=2)
+    tau_children = taus.children
     tau_children = _iterate_children(tau_children, PDGID.tau)
 
     # check if tau children are leptons or hadrons
@@ -168,7 +177,7 @@ def gen_selection_Ztautau(
     GenTauVars["GenTauhm"] = ((tauh == 1) & (taumu == 1)).to_numpy()
     GenTauVars["GenTauhe"] = ((tauh == 1) & (taue == 1)).to_numpy()
     #dR fatjet and gen tau
-    Ztt = Z[ak.sum(is_tt, axis=2) == 2]
+    Ztt = Z[ak.sum(is_tt,axis = 1) == 2]
     Ztt = ak.pad_none(Ztt, 1, axis=1, clip=True)[:, 0]
     ttdr = pad_val(fatjets[:, :2].delta_r(Ztt),2, axis=1)
     GenMatchingVars = {
@@ -217,10 +226,10 @@ def gen_selection_HHbbtautau(
     taus = higgs_children[is_tt]
     flat_taus = ak.flatten(taus, axis=2)
     GenTauVars = {f"GenTau{key}": pad_val(flat_taus[var], 2, axis=1) for (var, key) in P4.items()}
-
+    
     tau_children = ak.flatten(taus.children, axis=2)
-    tau_children = _iterate_children(tau_children, PDGID.tau)
 
+    tau_children = _iterate_children(tau_children, PDGID.tau)
     # check if tau children are leptons or hadrons
     # check neutral and charged pion IDs for hadronic taus
     tauh = _sum_taus(
