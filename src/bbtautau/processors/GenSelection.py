@@ -75,7 +75,6 @@ def gen_selection_Zll(
     is_Zmumu = np.abs(Z_children.pdgId) == PDGID.mu
     is_ee = np.abs(g_leptons.pdgId) == PDGID.e
     is_mumu = np.abs(g_leptons.pdgId) == PDGID.mu
-
     # Event selections
     has_ee = ak.sum(is_ee, axis=1) == 2
     has_mumu = ak.sum(is_mumu, axis=1) == 2
@@ -85,9 +84,8 @@ def gen_selection_Zll(
 
     # Extract leptons
 
-    electrons = genparts[is_ee]
-    muons = genparts[is_mumu]
-
+    electrons = g_leptons[is_ee]
+    muons = g_leptons[is_mumu]
     # Save electron variables
     GenElectronVars = {
         f"GenElectron{key}": pad_val(electrons[var], 2, axis=1)
@@ -149,12 +147,10 @@ def gen_selection_Ztautau(
         (abs(genparts.pdgId) == 15) 
         ]
     # Identify taus
-    
     is_tt = np.abs(g_leptons.pdgId) == PDGID.tau
     # checking that there are 2 bs and 2 taus
    
     has_tt = ak.sum(is_tt, axis=1) == 2
-    
 
     if selection_args is not None:
         add_selection("has_tautau",  has_tt, *selection_args)
