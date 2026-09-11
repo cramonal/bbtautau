@@ -111,13 +111,13 @@ def get_ak8jets(fatjets: FatJetArray, nano_version: str):
             )
             fatjets[f"globalParT_X{tautau}"] = fatjets[f"globalParT3_X{tautau}"]
             fatjets[f"globalParT_X{tautau}vsQCDOtherTau"] = fatjets[f"globalParT3_X{tautau}"] / (
-                   fatjets[f"globalParT3_Xtauhtauh"] + fatjets[f"globalParT_Xtauhtaue"] + fatjets[f"globalParT_Xtauhtaum"] + fatjets["globalParT_QCD"]
+                   fatjets["globalParT3_Xtauhtauh"] + fatjets["globalParT3_Xtauhtaue"] + fatjets["globalParT3_Xtauhtaum"] + fatjets["globalParT_QCD"]
         )
             fatjets[f"globalParT_X{tautau}vsQCDTopOtherTau"] = fatjets[f"globalParT3_X{tautau}"] / (
-                   fatjets[f"globalParT3_Xtauhtauh"] + fatjets[f"globalParT_Xtauhtaue"] + fatjets[f"globalParT_Xtauhtaum"]  + fatjets["globalParT_QCD"] + fatjets["globalParT_Top"]
+                   fatjets["globalParT3_Xtauhtauh"] + fatjets["globalParT3_Xtauhtaue"] + fatjets["globalParT3_Xtauhtaum"]  + fatjets["globalParT_QCD"] + fatjets["globalParT_Top"]
         )
             fatjets[f"globalParT_X{tautau}vsTopOtherTau"] = fatjets[f"globalParT3_X{tautau}"] / (
-                  fatjets[f"globalParT3_Xtauhtauh"] + fatjets[f"globalParT_Xtauhtaue"] + fatjets[f"globalParT_Xtauhtaum"]  + fatjets["globalParT_Top"]
+                  fatjets["globalParT3_Xtauhtauh"] + fatjets["globalParT3_Xtauhtaue"] + fatjets["globalParT3_Xtauhtaum"]  + fatjets["globalParT_Top"]
         )
     if nano_version.startswith("v12"):
         fatjets["globalParT_massResCorr"] = fatjets.globalParT_massRes
@@ -140,15 +140,6 @@ def get_ak8jets(fatjets: FatJetArray, nano_version: str):
             fatjets.globalParT3_massCorrGeneric * (1 - fatjets.rawFactor) * fatjets.mass
         )
 
-    fatjets["globalParT_massResCorr"] = fatjets.globalParT_massRes
-    fatjets["globalParT_massVisCorr"] = fatjets.globalParT_massVis
-    fatjets["globalParT_massResApplied"] = (
-        fatjets.globalParT_massRes * (1 - fatjets.rawFactor) * fatjets.mass
-    )
-    fatjets["globalParT_massVisApplied"] = (
-        fatjets.globalParT_massVis * (1 - fatjets.rawFactor) * fatjets.mass
-    )
-    
     return fatjets
 
 

@@ -490,9 +490,15 @@ class tautauSkimmer(SkimmerABC):
         )
 
         if JEC_loader.met_factory is not None:
-            met = JEC_loader.met_factory.build(events.MET, jets, {}) if isData else events.MET
+            if self._nano_version == "v15":
+                met = JEC_loader.met_factory.build(events.PFMET, jets, {}) if isData else events.PFMET
+            else:
+                met = JEC_loader.met_factory.build(events.MET, jets, {}) if isData else events.MET
         else:
-            met = events.MET
+            if self._nano_version == "v15":
+                met = events.PFMET
+            else:
+                met = events.MET
 
         print("ak4 JECs", f"{time.time() - start:.2f}")
 
