@@ -240,6 +240,59 @@ class HLTs:
                 dataset="JetMET",
             ),
         ],
+        "massindep": [
+            # SoftDrop/PNet mass independent triggers
+            HLT(
+                name="HLT_AK8PFJet500",
+                years=years_all,
+                dataset="JetMET",
+            ),
+            HLT(
+                name="HLT_PFJet500",
+                years=years_all,
+                dataset="JetMET",
+            ),
+            HLT(
+                name="HLT_PFHT1050",
+                years=years_all,
+                dataset="JetMET",
+            ),
+            HLT(
+                name="HLT_PFHT500_PFMET100_PFMHT100_IDTight",
+                years=years_all,
+                dataset="JetMET",
+            ),
+            HLT(
+                name="HLT_PFHT700_PFMET95_PFMHT95_IDTight",
+                years=years_2022,
+                dataset="JetHT",
+            ),
+            HLT(
+                name="HLT_PFHT700_PFMET85_PFMHT85_IDTight",
+                years=years_all,
+                dataset="JetMET",
+            ),
+            HLT(
+                name="HLT_AK8PFHT800_TrimMass50",
+                years=years_2022,
+                dataset="JetHT",
+            ),
+            HLT(
+                name="HLT_AK8PFHT800_TrimMass50",
+                years=years_2022,
+                dataset="JetMET",
+            ),
+            HLT(
+                name="HLT_AK8PFJet400_TrimMass30",
+                years=years_2022,
+                dataset="JetHT",
+            ),
+            HLT(
+                name="HLT_AK8PFJet400_TrimMass30",
+                years=years_2022,
+                dataset="JetMET",
+            ),
+        ],
         "parking": [
             # Moved to Parking in 2023 after 6fb-1
             HLT(

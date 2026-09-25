@@ -1,0 +1,87 @@
+{
+  "TT":
+      {
+      "subsamples":
+        [
+          "TTto2L2Nu",
+          "TTto4Q",
+          "TTtoLNu2Q",
+          ],
+      "files_per_job":
+        {
+          "TTto2L2Nu": 20,
+          "TTto4Q": 20,
+          "TTtoLNu2Q": 5,
+          },
+      "chunksize": 10000,
+       },
+    "QCD": { "files_per_job": 20, "batch_size": 5, "chunksize": 10000 },
+    #"diboson" : {"files_per_job" : 30},
+    "HTauTau": {"files_per_job" : 20, "chunksize": 10000},
+  "VJets":
+      {
+      "subsamples":
+        [
+          "DYto2Tau-2Jets_MLL-50_0J",
+          "DYto2Tau-2Jets_MLL-50_1J",
+          "DYto2Tau-2Jets_MLL-50_2J",
+          "DYto2E-2Jets_MLL-50_0J",
+          "DYto2E-2Jets_MLL-50_1J",
+          "DYto2E-2Jets_MLL-50_2J",
+          "DYto2Mu-2Jets_MLL-50_0J",
+          "DYto2Mu-2Jets_MLL-50_1J",
+          "DYto2Mu-2Jets_MLL-50_2J",
+          "Wto2Q-2Jets_PTQQ-100",
+          "Wto2Q-2Jets_PTQQ-200",
+          "Wto2Q-2Jets_PTQQ-400",
+          "Wto2Q-2Jets_PTQQ-600",
+          "WtoLNu-2Jets_PTLNu-40to100_1J",
+          "WtoLNu-2Jets_PTLNu-40to100_2J",
+          "WtoLNu-2Jets_PTLNu-100to200_1J",
+          "WtoLNu-2Jets_PTLNu-100to200_2J",
+          "WtoLNu-2Jets_PTLNu-200to400_1J",
+          "WtoLNu-2Jets_PTLNu-200to400_2J",
+          "WtoLNu-2Jets_PTLNu-400to600_1J",
+          "WtoLNu-2Jets_PTLNu-400to600_2J",
+          "WtoLNu-2Jets_PTLNu-600_1J",
+          "WtoLNu-2Jets_PTLNu-600_2J",
+          "Zto2Q-2Jets_PTQQ-100",
+          "Zto2Q-2Jets_PTQQ-200",
+          "Zto2Q-2Jets_PTQQ-400",
+          "Zto2Q-2Jets_PTQQ-600",
+          ],
+      "files_per_job": 20,
+      "batch_size": 10,
+      "chunksize": 10000,
+       },
+    #"Hbb": { "files_per_job": 40 },
+    # "JetMET": { "files_per_job": 20, "chunksize": 10000 },
+    #"EGamma": { "files_per_job": 20 },
+    #"Muon": { "files_per_job": 20 },
+    "Tau":
+      {
+      "subsamples":
+        [
+          "Tau_2024C",
+          "Tau_2024D",
+          "Tau_2024E",
+          "Tau_2024F",
+          "Tau_2024G",
+          "Tau_2024H",
+          "Tau_2024I",
+          "Tau_2024I_v2",
+          ],
+      "files_per_job":
+        {
+          "Tau_2024C": 20,
+          "Tau_2024D": 20,
+          "Tau_2024E": 20,
+          "Tau_2024F": 20,
+          "Tau_2024G": 20,
+          "Tau_2024H": 20,
+          "Tau_2024I": 5,
+          "Tau_2024I_v2": 5,
+          },
+      "chunksize": 10000,
+       },
+}

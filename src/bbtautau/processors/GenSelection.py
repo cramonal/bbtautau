@@ -186,6 +186,67 @@ def gen_selection_Ztautau(
 
 
 
+def gen_selection_Htautau(
+    events: NanoEventsArray,
+    fatjets: FatJetArray,  # noqa: ARG001
+    selection_args: list,
+):
+    """Gets single-Higgs and tautau 4-vectors + tau decay information."""
+
+    genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
+
+    H = genparts[genparts.pdgId == PDGID.H]
+
+    # saving Higgs 4-vector info
+    GenHiggsVars = {
+        f"GenHiggs{key}": ak.to_numpy(ak.pad_none(H[var], 1, clip=True))
+        for (var, key) in P4.items()
+    }
+
+    H_children = H.children
+    GenHiggsVars["GenHiggsChildren"] = pad_val(H_children.pdgId[:, :, 0], 2, axis=1)
+
+    # no H mother required, to be robust to FSR/radiation in the gen record
+    g_leptons = genparts[(abs(genparts.pdgId) == PDGID.tau)]
+
+    # Identify taus
+    is_Htt = np.abs(H_children.pdgId) == PDGID.tau
+    is_tt = np.abs(g_leptons.pdgId) == PDGID.tau
+
+    # checking that there are 2 taus from the Higgs
+    has_tt = ak.sum(ak.flatten(is_Htt, axis=2), axis=1) == 2
+    if selection_args is not None:
+        add_selection("has_tautau", has_tt, *selection_args)
+
+    taus = g_leptons[is_tt]
+    GenTauVars = {f"GenTau{key}": pad_val(taus[var], 2, axis=1) for (var, key) in P4.items()}
+
+    tau_children = taus.children
+    tau_children = _iterate_children(tau_children, PDGID.tau)
+
+    # check if tau children are leptons or hadrons
+    # check neutral and charged pion IDs for hadronic taus
+    tauh = _sum_taus(
+        ak.any([ak.any(np.abs(tau_children.pdgId) == pid, axis=2) for pid in PDGID.pions], axis=0)
+    )
+    taumu = _sum_taus(ak.any(np.abs(tau_children.pdgId) == PDGID.mu, axis=2))
+    taue = _sum_taus(ak.any(np.abs(tau_children.pdgId) == PDGID.e, axis=2))
+
+    GenTauVars["GenTauhh"] = (tauh == 2).to_numpy()
+    GenTauVars["GenTauhm"] = ((tauh == 1) & (taumu == 1)).to_numpy()
+    GenTauVars["GenTauhe"] = ((tauh == 1) & (taue == 1)).to_numpy()
+
+    # dR fatjet and gen tau pair (Higgs matched by its tautau decay)
+    Htt = H[ak.sum(is_Htt, axis=2) == 2]
+    Htt = ak.pad_none(Htt, 1, axis=1, clip=True)[:, 0]
+    ttdr = pad_val(fatjets[:, :2].delta_r(Htt), 2, axis=1)
+    GenMatchingVars = {
+        "ak8FatJetHttdR": ttdr,
+    }
+
+    return {**GenHiggsVars, **GenTauVars, **GenMatchingVars}
+
+
 def gen_selection_HHbbtautau(
     events: NanoEventsArray,
     fatjets: FatJetArray,  # noqa: ARG001
