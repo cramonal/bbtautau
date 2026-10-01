@@ -28,16 +28,13 @@ def get_processor(
 ):
     # define processor
     if processor == "skimmer":
-        from bbtautau.processors import tautauSkimmer
+        from bbtautau.processors import dymumuSkimmer
 
-        return tautauSkimmer(
+        return dymumuSkimmer(
             xsecs=xsecs,
             save_systematics=save_systematics,
             region=region,
             nano_version=nano_version,
-            fatjet_pt_cut=fatjet_pt_cut,
-            fatjet_bb_preselection=fatjet_bb_preselection,
-            prescale_factor=prescale_factor,
         )
 
 

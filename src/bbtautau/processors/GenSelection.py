@@ -346,3 +346,77 @@ def gen_selection_HH4b(
     GenbVars = {f"Genb{key}": pad_val(bs[var], 4, axis=1) for (var, key) in P4.items()}
 
     return {**GenHiggsVars, **GenbVars}
+
+
+
+def gen_selection_DYleptonic(
+    events: NanoEventsArray,
+    reco_muons,  # the 2 selected, reconstructed signal muons, 1 pair/event
+    selection_args: list,
+):
+    """
+    Gets Z -> mumu gen 4-vectors + matches each of the 2 selected
+    reconstructed muons (`reco_muons`, one OS pair per event - e.g. the
+    `weight_muons` pair built in dymumuSkimmer.py) to the nearest gen-level
+    muon from the Z decay.
+    """
+    genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
+
+    # Select Z bosons
+    Z = genparts[genparts.pdgId == PDGID.Z]
+
+    # Save Z 4-vector info
+    GenZVars = {
+        f"GenZ{key}": ak.to_numpy(ak.pad_none(Z[var], 1, clip=True))
+        for (var, key) in P4.items()
+    }
+    Z_children = Z.children
+    GenZVars["GenZChildren"] = pad_val(Z_children.pdgId[:, :, 0], 2, axis=1)
+
+    # gen-level muons (no Z-mother requirement, to be robust to FSR)
+    g_leptons = genparts[abs(genparts.pdgId) == PDGID.mu]
+    is_mumu = np.abs(g_leptons.pdgId) == PDGID.mu
+    has_mumu = ak.sum(is_mumu, axis=1) == 2
+
+    #if selection_args is not None:
+    #    add_selection("has_gen_mumu", has_mumu, *selection_args)
+
+    
+    genmuons = g_leptons[is_mumu]
+    GenMuonVars = {
+        f"GenMuon{key}": pad_val(genmuons[var], 2, axis=1) for (var, key) in P4.items()
+    }
+    GenMuonVars["HasGenMuMu"] = ak.fill_none(has_mumu, False).to_numpy()
+    #########################
+    # reco <-> gen muon matching
+    #########################
+
+    genmu_padded = ak.pad_none(genmuons, 2, axis=1, clip=True)
+    genmu0 = genmu_padded[:, 0]
+    genmu1 = genmu_padded[:, 1]
+
+    reco_padded = ak.pad_none(reco_muons, 2, axis=1, clip=True)
+    reco0 = reco_padded[:, 0]
+    reco1 = reco_padded[:, 1]
+
+    dr_00 = reco0.delta_r(genmu0)
+    dr_01 = reco0.delta_r(genmu1)
+    dr_10 = reco1.delta_r(genmu0)
+    dr_11 = reco1.delta_r(genmu1)
+
+    # assign reco0 to whichever gen muon it's closer to; reco1 gets the other
+    # (simple nearest-neighbor assignment - fine here since the 2 gen muons
+    # from an on-shell Z are essentially never degenerate in direction)
+    reco0_to_genmu0 = dr_00 <= dr_01
+    dr_reco0 = ak.where(reco0_to_genmu0, dr_00, dr_01)
+    dr_reco1 = ak.where(reco0_to_genmu0, dr_11, dr_10)
+
+    match_dR = 0.1  # standard gen-reco muon matching cone
+    GenMatchingVars = {
+        "RecoMuon1GendR": ak.fill_none(dr_reco0, -999.0).to_numpy(),
+        "RecoMuon2GendR": ak.fill_none(dr_reco1, -999.0).to_numpy(),
+        "RecoMuon1GenMatched": ak.fill_none(dr_reco0 <= match_dR, False).to_numpy(),
+        "RecoMuon2GenMatched": ak.fill_none(dr_reco1 <= match_dR, False).to_numpy(),
+    }
+
+    return {**GenZVars, **GenMuonVars, **GenMatchingVars}

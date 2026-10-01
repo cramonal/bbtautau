@@ -23,6 +23,34 @@ from coffea.nanoevents.methods.nanoaod import (
 
 from bbtautau.HLTs import HLTs
 
+def good_muons_dymumu(events, leptons: MuonArray, year: str, _type: str = "ptcorr"):
+    """
+    Muon selection for the DY->mumu control-region skimmer:
+        pT >= 20 GeV, |eta| < 2.4
+        Tight ID
+        miniPFRelIso_all < 0.1
+ 
+    """
+    trigobj = events.TrigObj
+ 
+    lsel = (
+        leptons.tightId
+        & (leptons.pt >= 20)
+        & (abs(leptons.eta) < 2.4)
+        & (leptons.miniPFRelIso_all < 0.1)
+    )
+    leptons = leptons[lsel]
+ 
+    triggers = {"Muon": (3, 26), "MuonTau": (6, 22)}
+    trig_leptons = trigobj[trigobj.id == PDGID.mu]
+    TrigMatchDict = {
+        f"MuonTrigMatch{trigger}": trig_match_sel(
+            events, leptons, trig_leptons, year, trigger, filterbit, ptcut
+        )
+        for trigger, (filterbit, ptcut) in triggers.items()
+    }
+ 
+    return leptons, TrigMatchDict
 
 def trig_match_sel(events, leptons, trig_leptons, year, trigger, filterbit, ptcut, trig_dR=0.2):
     """
