@@ -247,7 +247,7 @@ def loose_electrons(events, leptons: ElectronArray, year: str):
         & (abs(leptons.eta) < 2.5)
         & (abs(leptons.dz) < 0.2)
         & (abs(leptons.dxy) < 0.05)
-        & (abs(leptons.miniPFRelIso_all) < 0.2)
+        & (abs(leptons.miniPFRelIso_all) <= 0.2)
     )
     leptons = leptons[lsel]
 
@@ -266,7 +266,7 @@ def loose_electrons(events, leptons: ElectronArray, year: str):
 
 """
 Trigger quality bits in NanoAOD v12
-0 => TrkIsoVVL,
+0 => TrkVVL,
 1 => Iso,
 2 => OverlapFilter PFTau,
 3 => 1mu,
@@ -318,7 +318,7 @@ def loose_muons(events, leptons: MuonArray, year: str):
         & (abs(leptons.eta) < 2.4)
         & (abs(leptons.dz) < 0.2)
         & (abs(leptons.dxy) < 0.05)
-        & (abs(leptons.miniPFRelIso_all) < 0.2)
+        & (abs(leptons.miniPFRelIso_all) <= 0.2)
     )
     leptons = leptons[lsel]
 
