@@ -216,7 +216,7 @@ class dymumuSkimmer(SkimmerABC):
         print("dr:", ak.to_list(dr[:20]))
         # dR and mass-window requirements applied at the pair level
         pair_sel = (
-            (dr > self.muon_selection["dr_min"])
+            (dr < self.muon_selection["dr_min"])
             & (dimuon.mass > self.muon_selection["mass_min"])
             & (dimuon.mass < self.muon_selection["mass_max"])
         )
