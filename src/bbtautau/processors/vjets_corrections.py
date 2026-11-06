@@ -5,7 +5,7 @@ import pathlib
 import awkward as ak
 import correctionlib
 from coffea.analysis_tools import Weights
- 
+import numpy as np 
 package_path = str(pathlib.Path(__file__).parent.parent.resolve())
  
 # fix this to wherever you land the vendored vjets_corrections_*.json - see
@@ -60,25 +60,25 @@ def add_VJets_corrections(weights: Weights, dataset: str, genpart):
     vpt = ak.fill_none(boson.pt, 0.0)
  
     def add_systs(systlist, qcdcorr, ewkcorr):
-        ewknom = ewkcorr.evaluate("nominal", vpt)
+        ewknom = ewkcorr.evaluate("nominal", np.array(vpt))
         weights.add("vjets_nominal", qcdcorr * ewknom if qcdcorr is not None else ewknom)
         ones = ak.ones_like(vpt)
         for syst in systlist:
             weights.add(
                 syst,
                 ones,
-                ewkcorr.evaluate(syst + "_up", vpt) / ewknom,
-                ewkcorr.evaluate(syst + "_down", vpt) / ewknom,
+                ewkcorr.evaluate(syst + "_up", np.array(vpt)) / ewknom,
+                ewkcorr.evaluate(syst + "_down", np.array(vpt)) / ewknom,
             )
  
     vjets_kfactors = correctionlib.CorrectionSet.from_file(vjets_json_path)
  
     if isZ_dataset:
-        qcdcorr = vjets_kfactors["Z_MLMtoFXFX"].evaluate(vpt)
+        qcdcorr = vjets_kfactors["Z_MLMtoFXFX"].evaluate(np.array(vpt))
         ewkcorr = vjets_kfactors["Z_FixedOrderComponent"]
         add_systs(zsysts, qcdcorr, ewkcorr)
     elif isW_dataset:
-        qcdcorr = vjets_kfactors["W_MLMtoFXFX"].evaluate(vpt)
+        qcdcorr = vjets_kfactors["W_MLMtoFXFX"].evaluate(np.array(vpt))
         ewkcorr = vjets_kfactors["W_FixedOrderComponent"]
         add_systs(wsysts, qcdcorr, ewkcorr)
 

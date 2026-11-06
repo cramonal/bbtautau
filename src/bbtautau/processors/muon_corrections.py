@@ -11,7 +11,7 @@ import awkward as ak
 import correctionlib
 from coffea.analysis_tools import Weights
 from coffea.nanoevents.methods.nanoaod import MuonArray
- 
+import numpy as np
 # vendor this file from https://gitlab.cern.ch/cms-muonPOG/muonscarekit
 # (see module docstring above) and fix this import to match its location
 from bbtautau.MuonScaRe import pt_resol, pt_resol_var, pt_scale, pt_scale_var
@@ -154,9 +154,14 @@ def add_muon_weights(
     #cset = correctionlib.CorrectionSet.from_file(get_pog_json("muon", year))
     cset = load_corrections(get_pog_json("muon", year)) 
     m, nm = ak.flatten(muons), ak.num(muons, axis=1)
+    
     def get_sf(cset_key, syst):
-        sf = cset[cset_key].evaluate(abs(m.eta), getattr(m, pt_type), syst)
-        return ak.prod(ak.unflatten(sf, nm), axis=-1)
+        eta = np.asarray(m.eta)
+        pt = np.asarray(getattr(m, pt_type))
+    
+        result = cset[cset_key].evaluate(np.abs(eta), pt, syst)
+
+        return ak.prod(ak.unflatten(result, nm), axis=1)
     id_nom = get_sf(id_key, "nominal")
     id_up = get_sf(id_key, "systup")
     id_down = get_sf(id_key, "systdown")

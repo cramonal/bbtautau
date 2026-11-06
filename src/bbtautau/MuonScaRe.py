@@ -139,7 +139,10 @@ def get_rndm(eta, phi, nL, evtNr, lumiNr, cset, nested=False):
         lumiNr_f = ak.flatten(ak.broadcast_arrays(lumiNr, eta)[0])  # ak.full_like(eta_f, lumiNr)
     else:
         eta_f, phi_f, nL_f, nmuons = eta, phi, nL, np.ones_like(eta)
-
+    
+    eta_f = np.array(eta_f)
+    phi_f = np.array(phi_f)
+    nL_f = np.array(nL_f)
     mean_f = cset.get("cb_params").evaluate(abs(eta_f), nL_f, 0)
     sigma_f = cset.get("cb_params").evaluate(abs(eta_f), nL_f, 1)
     n_f = cset.get("cb_params").evaluate(abs(eta_f), nL_f, 2)
@@ -187,7 +190,8 @@ def get_std(pt, eta, nL, cset, nested=False):
         )
     else:
         eta_f, nL_f, pt_f, nmuons = eta, nL, pt, 1
-
+    eta_f = np.array(eta_f)
+    nL_f = np.array(nL_f)
     # obtain parameters from correctionlib
     param0_f = cset.get("poly_params").evaluate(abs(eta_f), nL_f, 0)
     param1_f = cset.get("poly_params").evaluate(abs(eta_f), nL_f, 1)
@@ -207,7 +211,7 @@ def get_k(eta, var, cset, nested=False):
         eta_f, nmuons = ak.flatten(eta), ak.num(eta)
     else:
         eta_f = eta
-
+    eta_f = np.array(eta_f)
     # obtain parameters from correctionlib
     k_data_f = cset.get("k_data").evaluate(abs(eta_f), var)
     k_mc_f = cset.get("k_mc").evaluate(abs(eta_f), var)
@@ -306,7 +310,7 @@ def pt_resol_var(pt_woresol, pt_wresol, eta, updn, cset, nested=False):
     else:
         eta_f, nmuons = eta, 1
         pt_wresol_f, pt_woresol_f = pt_wresol, pt_woresol
-
+    eta_f = np.array(eta_f)
     k_unc_f = cset.get("k_mc").evaluate(abs(eta_f), "stat")
     k_f = cset.get("k_mc").evaluate(abs(eta_f), "nom")
 
@@ -361,8 +365,8 @@ def pt_scale(is_data, pt, eta, phi, charge, cset, nested=False, low_pt_threshold
     else:
         eta_f, phi_f, nmuons = eta, phi, 1
 
-    a_f = cset.get("a_" + dtmc).evaluate(eta_f, phi_f, "nom")
-    m_f = cset.get("m_" + dtmc).evaluate(eta_f, phi_f, "nom")
+    a_f = cset.get("a_" + dtmc).evaluate(np.array(eta_f), np.array(phi_f), "nom")
+    m_f = cset.get("m_" + dtmc).evaluate(np.array(eta_f), np.array(phi_f), "nom")
 
     if nested:
         a, m = ak.unflatten(a_f, nmuons), ak.unflatten(m_f, nmuons)
@@ -394,7 +398,8 @@ def pt_scale_var(pt, eta, phi, charge, updn, cset, nested=False):
         eta_f, phi_f, nmuons = ak.flatten(eta), ak.flatten(phi), ak.num(eta)
     else:
         eta_f, phi_f, nmuons = eta, phi, 1
-
+    eta_f = np.array(eta_f)
+    phi_f = np.array(phi_f)
     stat_a_f = cset.get("a_mc").evaluate(eta_f, phi_f, "stat")
     stat_m_f = cset.get("m_mc").evaluate(eta_f, phi_f, "stat")
     stat_rho_f = cset.get("m_mc").evaluate(eta_f, phi_f, "rho_stat")

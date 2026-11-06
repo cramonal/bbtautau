@@ -11,7 +11,7 @@ import pathlib
 from pathlib import Path
 
 import contextlib
-
+import numpy as np
 import awkward as ak
 import dask_awkward as dak
 import numpy as np
