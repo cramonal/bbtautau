@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-import bbtautau.compat
 import yaml
 from boostedhh import run_utils
 from boostedhh.hh_vars import DATA_SAMPLES
