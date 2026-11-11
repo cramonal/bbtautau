@@ -118,6 +118,48 @@ class tautauSkimmer(SkimmerABC):
         },
     }
 
+    # only these branches are written to the output
+    save_vars = [
+        # event info
+        "run",
+        "event",
+        "luminosityBlock",
+        "nPU",
+        "nPV",
+        "ht",
+        "nFatJets",
+        "nTaus",
+        "nElectrons",
+        "nMuons",
+        # MET
+        "METPt",
+        "METPhi",
+        # AK8 jets
+        "ak8FatJetPt",
+        "ak8FatJetEta",
+        "ak8FatJetPhi",
+        "ak8FatJetMass",
+        "ak8FatJetMsd",
+        "ak8FatJetMatchedGenJetPt",
+        "ak8FatJetParTXtauhtauhvsQCDTop",
+        "ak8FatJetParTXtauhtauhvsQCD",
+        "ak8FatJetParTXbbvsQCD",
+        "ak8FatJetParTmassResApplied",
+        "ak8FatJetParTmassVisApplied",
+        "ak8FatJetCAmsoftdrop",
+        "ak8FatJetSubleadingMETdPhi",
+        # taus
+        "TauPt",
+        "TauEta",
+        "TauPhi",
+        "Taucharge",
+        "TauDeepTauvsJet",
+        "TauDeepTauvsMu",
+        "TauDeepTauvsE",
+    ]
+    # plus every branch starting with these (triggers, weights and variations, gen info)
+    save_prefixes = ("HLT_", "weight", "Gen")
+
     # only applied if fatjet_bb_preselection is True
     preselection = {  # noqa: RUF012
         # roughly, 85% signal efficiency, 2% QCD efficiency (pT: 250-400, mSD:0-250, mRegLegacy:40-250)
@@ -901,6 +943,7 @@ class tautauSkimmer(SkimmerABC):
         skimmed_events = {
             key: value.reshape(len(skimmed_events["weight"]), -1)[sel_all]
             for (key, value) in skimmed_events.items()
+            if key in self.save_vars or key.startswith(self.save_prefixes)
         }
 
         dataframe = self.to_pandas(skimmed_events)
