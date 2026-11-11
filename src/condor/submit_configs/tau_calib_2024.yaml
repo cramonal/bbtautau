@@ -57,7 +57,7 @@
       "chunksize": 10000,
        },
     #"Hbb": { "files_per_job": 40 },
-    # "JetMET": { "files_per_job": 20, "chunksize": 10000 },
+    "JetMET": { "files_per_job": 20, "chunksize": 10000 },
     #"EGamma": { "files_per_job": 20 },
     #"Muon": { "files_per_job": 20 },
     "Tau":
