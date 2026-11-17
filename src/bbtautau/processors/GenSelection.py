@@ -247,6 +247,38 @@ def gen_selection_Htautau(
     return {**GenHiggsVars, **GenTauVars, **GenMatchingVars}
 
 
+def gen_selection_inclusive_taus(
+    events: NanoEventsArray,
+    fatjets: FatJetArray,  # noqa: ARG001
+    selection_args: list,  # noqa: ARG001
+):
+    """Gets gen tau 4-vectors + decay info for any process, regardless of mother
+    particle or tau count. No has_tautau selection cut is applied."""
+
+    genparts = events.GenPart[events.GenPart.hasFlags(GEN_FLAGS)]
+
+    taus = genparts[(abs(genparts.pdgId) == PDGID.tau)]
+
+    GenTauVars = {f"GenTau{key}": pad_val(taus[var], 2, axis=1) for (var, key) in P4.items()}
+
+    tau_children = taus.children
+    tau_children = _iterate_children(tau_children, PDGID.tau)
+
+    # check if tau children are leptons or hadrons
+    # check neutral and charged pion IDs for hadronic taus
+    tauh = _sum_taus(
+        ak.any([ak.any(np.abs(tau_children.pdgId) == pid, axis=2) for pid in PDGID.pions], axis=0)
+    )
+    taumu = _sum_taus(ak.any(np.abs(tau_children.pdgId) == PDGID.mu, axis=2))
+    taue = _sum_taus(ak.any(np.abs(tau_children.pdgId) == PDGID.e, axis=2))
+
+    GenTauVars["GenTauhh"] = (tauh == 2).to_numpy()
+    GenTauVars["GenTauhm"] = ((tauh == 1) & (taumu == 1)).to_numpy()
+    GenTauVars["GenTauhe"] = ((tauh == 1) & (taue == 1)).to_numpy()
+
+    return GenTauVars
+
+
 def gen_selection_HHbbtautau(
     events: NanoEventsArray,
     fatjets: FatJetArray,  # noqa: ARG001

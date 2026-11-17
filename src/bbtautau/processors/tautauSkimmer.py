@@ -49,6 +49,10 @@ gen_selection_dict = {
     "To2TauUncorrelatedDecay": GenSelection.gen_selection_Htautau,
     "to2TauUncorrelatedDecay": GenSelection.gen_selection_Htautau,
     "ttHtoNoB": GenSelection.gen_selection_Htautau,
+    "WtoLNu": GenSelection.gen_selection_inclusive_taus,
+    "TTto2L2Nu": GenSelection.gen_selection_inclusive_taus,
+    "TTto4Q": GenSelection.gen_selection_inclusive_taus,
+    "TTtoLNu2Q": GenSelection.gen_selection_inclusive_taus,
 }
 
 logger = logging.getLogger(__name__)
