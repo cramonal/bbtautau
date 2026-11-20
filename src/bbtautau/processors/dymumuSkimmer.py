@@ -188,16 +188,13 @@ class dymumuSkimmer(SkimmerABC):
             nano_version=self._nano_version,
         )
 
-        if JEC_loader.met_factory is not None:
-            if self._nano_version == "v15":
-                met = JEC_loader.met_factory.build(events.PFMET, jets, {}) if isData else events.PFMET
-            else:
-                met = JEC_loader.met_factory.build(events.MET, jets, {}) if isData else events.MET
+        # MET
+        if self._nano_version == "v15":
+            met = events.PuppiMET
+        elif JEC_loader.met_factory is not None:
+            met = JEC_loader.met_factory.build(events.MET, jets_corr, {}) if isData else events.MET
         else:
-            if self._nano_version == "v15":
-                met = events.PFMET
-            else:
-                met = events.MET
+            met = events.MET
 
         jets = objects.good_ak4jets(jets, nano_version=self._nano_version)
         ht = ak.sum(jets.pt, axis=1)
